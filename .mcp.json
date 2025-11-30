@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "strands-agents-sops": {
+      "command": "strands-agents-sops",
+      "args": ["mcp", "--sop-paths", "./sop"]
+    }
+  }
+}
