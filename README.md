@@ -42,6 +42,21 @@ No additional configuration is needed—Claude Code will detect and use the `.mc
 
 ## Usage
 
+### Environment Setup
+
+**Pourpoise (this repo):** Can be run from a laptop. Used for creating attempts, running evaluations, and generating leaderboards.
+
+**Attempt repositories:** Should be run in a GitHub Codespace for safety and consistency:
+1. Open the attempt repo in a Codespace
+2. Run with dangerous permissions enabled (e.g., `claude --dangerously-skip-permissions`)
+3. Let the LLM run to completion without intervention
+4. Save the prompts and commands used to `prompts.txt`
+
+This isolation ensures:
+- Consistent environment across attempts
+- Safe execution of LLM-generated code
+- No interference from local machine configuration
+
 ### Creating a New Benchmark Attempt
 
 To create a new attempt repository for any LLM evaluation:
