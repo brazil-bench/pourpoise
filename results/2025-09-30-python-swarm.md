@@ -19,6 +19,23 @@
 | Fix Commits | 7 (iterative test fixes) |
 | Real Data | 96MB Kaggle (FIFA players, matches) |
 
+## Token Usage (from prompts.txt)
+
+> ⚠️ **Note:** Token counts are from manually captured prompts.txt and may not be complete or accurate.
+
+| Session | Tool Uses | Tokens | Duration |
+|---------|-----------|--------|----------|
+| Session 1 | 4 | 59.4k | 58s |
+| Session 2 | 23 | 71.7k | 6m |
+| Session 3 | 60 | 111.5k | 12m |
+| Session 4 | 10 | 101.7k | 7m |
+| Session 5 | 58 | 127.7k | 12m |
+| Session 6 | 37 | 95.9k | 11m |
+| Session 7 | 21 | 119.4k | 12m |
+| **Total** | **213** | **~687k** | **~61m** |
+
+*7 sequential sessions reflecting iterative development pattern*
+
 ## Development Duration Breakdown
 
 | Phase | Duration | Description |

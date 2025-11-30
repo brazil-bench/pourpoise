@@ -34,6 +34,17 @@
 - Human-driven data enhancement after core work
 - Real Kaggle data added in Phase 3 (96MB)
 
+## Token Usage Comparison
+
+> ⚠️ **Note:** Token counts are from manually captured prompts.txt files and may not be complete or accurate.
+
+| Metric | Hive | Swarm | Notes |
+|--------|------|-------|-------|
+| **Total Tokens** | ~288k | ~687k | Swarm used ~2.4x more |
+| **Tool Uses** | 99 | 213 | Swarm more iterative |
+| **Sessions/Agents** | 4 (parallel) | 7 (sequential) | Different patterns |
+| **Tokens per LOC** | ~41 | ~79 | Hive more efficient |
+
 ## Detailed Metrics Comparison
 
 | Metric | 2025-10-30-python-hive | 2025-09-30-python-swarm | Notes |
@@ -45,6 +56,7 @@
 | **Dependencies** | 15 | 25+ | Swarm has data processing deps |
 | **Commits** | 7 | 32 | Swarm iterative, Hive focused |
 | **Autonomous Duration** | ~1h 51m | ~1h 31m | Similar (corrected from git) |
+| **Tokens (approx)** | ~288k | ~687k | Hive more token-efficient |
 | **Fix Commits** | 1 | 7 | Swarm used iterative TDD |
 | **Test Scenarios** | 64 | 39 | Hive more tests |
 | **Test Pass Rate** | 100% | 100% | Both passing |
@@ -102,12 +114,15 @@ The Hive pattern achieved the highest score primarily due to **100% spec complia
 |--------|------|-------|--------|
 | Spec completeness | 18/18 (100%) | 13/18 (72%) | 🏆 Hive |
 | Autonomous duration | ~1h 51m | ~1h 31m | 🏆 Swarm (slightly) |
+| Token usage* | ~288k | ~687k | 🏆 Hive |
 | Initial coding speed | ~70 min | ~33 min | 🏆 Swarm |
 | Test fixing speed | ~41 min | ~58 min | 🏆 Hive |
 | Real data included | No | Yes (96MB) | 🏆 Swarm |
 | Test coverage | 64 scenarios | 39 scenarios | 🏆 Hive |
 | Code efficiency | 7,090 LOC | 8,683 LOC | 🏆 Hive |
 | Neo4j approach | Async driver | Sync driver | Different |
+
+*Token counts from manually captured prompts.txt, may be incomplete
 
 ### Pattern Insights
 

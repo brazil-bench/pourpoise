@@ -17,6 +17,19 @@
 | First Commit | 2025-10-29 17:12:33 -0700 (00:12 UTC Oct 30) |
 | Last Commit | 2025-10-30 02:06:31 +0000 |
 
+## Token Usage (from prompts.txt)
+
+> ⚠️ **Note:** Token counts are from manually captured prompts.txt and may not be complete or accurate.
+
+| Agent | Tool Uses | Tokens | Duration |
+|-------|-----------|--------|----------|
+| Agent 1 | 19 | 83.7k | 17m 6s |
+| Agent 2 | 38 | 103.2k | 22m 6s |
+| Agent 3 | 42 | 101.3k | 19m 8s |
+| **Total (visible)** | **99** | **~288k** | **~58m** |
+
+*4 agents were spawned (researcher, coder, tester, analyst) in parallel, but only 3 completion records visible in prompts.txt*
+
 ## Development Duration Breakdown
 
 | Phase | Duration | Description |
