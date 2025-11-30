@@ -42,6 +42,29 @@ No additional configuration is needed—Claude Code will detect and use the `.mc
 
 ## Usage
 
+### Creating a New Benchmark Attempt
+
+To create a new attempt repository for any LLM evaluation:
+
+```
+/strands-agents-sops:create-attempt attempt_name: 2025-12-01-python-gpt4
+```
+
+This will:
+1. Create a new repo from the benchmark-template
+2. Verify the spec file is present
+3. Provide instructions for running the benchmark
+
+**Naming convention:** `YYYY-MM-DD-{language}-{description}`
+- `2025-12-01-python-gpt4` - GPT-4 implementing in Python
+- `2025-12-01-python-gemini` - Gemini in Python
+- `2025-12-01-typescript-claude` - Claude in TypeScript
+
+After creating, run your LLM with a prompt like:
+> "Read brazilian-soccer-mcp-guide.md and implement phases 1, 2, and 3 as described. Test using BDD PyTest. Use Neo4j for the graph database."
+
+**Important:** Save your initial command and prompts to `prompts.txt` for evaluation.
+
 ### Evaluating a Benchmark Attempt
 
 To evaluate an attempt, use the evaluate-attempt SOP via the MCP server:

@@ -1,27 +1,30 @@
 # Create Benchmark Attempt
 
 ## Overview
-This SOP creates a new brazil-bench attempt from the template repository,
-configures it for a specific orchestration pattern, and initiates the work
-by creating a GitHub issue with the implementation task.
+This SOP creates a new brazil-bench attempt repository from the template.
+The repository provides a clean starting point for evaluating any LLM or
+agent framework against the Brazilian Soccer MCP benchmark task.
 
 ## Parameters
-- **attempt_name** (required): Repository name (e.g., `attempt-3`, `solo-baseline`)
-- **pattern** (required): Orchestration pattern (`solo`, `swarm`, `hive`, `crew`, `custom`)
-- **pattern_config** (optional): Path to custom pattern configuration file
-- **assignee** (optional): GitHub username to assign the implementation issue
+- **attempt_name** (required): Repository name using format `YYYY-MM-DD-{language}-{description}`
+  - Examples: `2025-12-01-python-gpt4`, `2025-12-01-typescript-gemini`, `2025-12-01-python-claude-solo`
 
 ## Steps
 
 ### 1. Validate Preconditions
-Ensure the attempt doesn't already exist and the pattern is recognized.
+Ensure the attempt doesn't already exist.
 
 **Constraints:**
 - You MUST verify the repo name doesn't exist in brazil-bench org
-- You MUST verify the pattern is valid or pattern_config is provided
+- You MUST verify the attempt_name follows the naming convention
 - You MUST NOT proceed if preconditions fail
+
 ```bash
-gh repo view brazil-bench/{attempt_name} 2>&1 | grep -q "Could not resolve"
+# Check repo doesn't exist
+gh repo view brazil-bench/{attempt_name} 2>&1 | grep -q "Could not resolve" || echo "ERROR: Repo already exists"
+
+# Validate naming format (YYYY-MM-DD-language-description)
+echo "{attempt_name}" | grep -qE "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z]+-[a-z0-9-]+$" || echo "WARNING: Name doesn't follow convention"
 ```
 
 ### 2. Create Repository from Template
@@ -31,121 +34,81 @@ Instantiate a new repo from benchmark-template.
 - You MUST use the GitHub template mechanism
 - You MUST create as public repo
 - You MUST wait for repo creation to complete before proceeding
+
 ```bash
 gh repo create brazil-bench/{attempt_name} \
   --template brazil-bench/benchmark-template \
   --public \
-  --confirm
+  --clone
 ```
 
-### 3. Configure Orchestration Pattern
-Add pattern-specific files to the new repository.
+### 3. Verify Template Contents
+Confirm the spec file is present and unmodified.
 
 **Constraints:**
-- You MUST add a CLAUDE.md appropriate for the pattern
-- You MUST record the pattern in a metadata file
-- You SHOULD add any pattern-specific tooling configs
-- You MUST NOT modify spec.md
+- You MUST verify `brazilian-soccer-mcp-guide.md` exists (the spec)
+- You MUST list the initial contents for the user
+- You MUST NOT modify any template files
+
 ```bash
-# Clone to add files
-gh repo clone brazil-bench/{attempt_name} ./tmp/{attempt_name}
-
-# Write pattern metadata
-cat > ./tmp/{attempt_name}/.brazil-bench.json << EOF
-{
-  "pattern": "{pattern}",
-  "created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "template_version": "1.0"
-}
-EOF
-
-# Copy pattern-specific CLAUDE.md
-cp ./patterns/{pattern}/CLAUDE.md ./tmp/{attempt_name}/CLAUDE.md
-
-# Push
-cd ./tmp/{attempt_name}
-git add -A
-git commit -m "Configure for {pattern} orchestration pattern"
-git push
+cd {attempt_name}
+ls -la
+cat brazilian-soccer-mcp-guide.md | head -50
 ```
 
-### 4. Create Implementation Issue
-Create the issue that will drive the worker agent.
+### 4. Document Next Steps
+Provide instructions for running the benchmark.
 
 **Constraints:**
-- You MUST create exactly one issue titled "Implement MCP Server"
-- You MUST include the full implementation SOP in the issue body
-- You SHOULD assign to {assignee} if provided
-- You MUST label with `brazil-bench` and `{pattern}`
-```bash
-gh issue create \
-  --repo brazil-bench/{attempt_name} \
-  --title "Implement MCP Server per spec.md" \
-  --body-file ./sops/implement-mcp.sop.md \
-  --label "brazil-bench,{pattern}" \
-  ${assignee:+--assignee {assignee}}
-```
-
-### 5. Record Attempt
-Register this attempt in the Pourpoise tracking system.
-
-**Constraints:**
-- You MUST append to `./attempts.json`
-- You MUST include: repo name, pattern, creation timestamp, issue URL
-- You SHOULD trigger any notification webhooks configured
-```bash
-# Get issue URL
-ISSUE_URL=$(gh issue list --repo brazil-bench/{attempt_name} --limit 1 --json url -q '.[0].url')
-
-# Append to tracking
-cat ./attempts.json | jq \
-  --arg name "{attempt_name}" \
-  --arg pattern "{pattern}" \
-  --arg created "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-  --arg issue "$ISSUE_URL" \
-  '.attempts += [{"name": $name, "pattern": $pattern, "created": $created, "issue": $issue, "status": "active"}]' \
-  > ./attempts.json.tmp && mv ./attempts.json.tmp ./attempts.json
-
-git add attempts.json
-git commit -m "Track new attempt: {attempt_name}"
-git push
-```
-
-### 6. Verify Setup
-Confirm the attempt is ready for a worker agent.
-
-**Constraints:**
-- You MUST verify repo is accessible
-- You MUST verify issue exists and is open
-- You MUST verify spec.md matches template
-- You SHOULD output a ready confirmation
-```bash
-echo "=== Verification ==="
-gh repo view brazil-bench/{attempt_name} --json name,url
-gh issue list --repo brazil-bench/{attempt_name} --state open
-echo "Attempt {attempt_name} ready for {pattern} worker"
-```
+- You MUST output the repository URL
+- You MUST explain how to run the benchmark with any LLM
+- You MUST remind user to capture prompts.txt for evaluation
 
 ## Output
+
 Upon completion, report:
-- Repository URL: `https://github.com/brazil-bench/{attempt_name}`
-- Issue URL: (from step 4)
-- Pattern: {pattern}
-- Status: Ready for worker
+
+```
+=== Attempt Created ===
+Repository: https://github.com/brazil-bench/{attempt_name}
+Spec file:  brazilian-soccer-mcp-guide.md
+
+=== Next Steps ===
+1. Clone the repository or open in your preferred environment
+2. Run your LLM/agent with a prompt like:
+   "Read brazilian-soccer-mcp-guide.md and implement phases 1, 2, and 3
+    as described. Test using BDD PyTest. Use Neo4j for the graph database."
+3. Save the initial command and prompts to prompts.txt for evaluation
+4. When complete, evaluate with:
+   /strands-agents-sops:evaluate-attempt attempt_repo: {attempt_name}
+```
+
+## Naming Convention
+
+Use the format: `YYYY-MM-DD-{language}-{description}`
+
+| Component | Description | Examples |
+|-----------|-------------|----------|
+| Date | When attempt started | 2025-12-01 |
+| Language | Implementation language | python, typescript, go |
+| Description | LLM or pattern used | gpt4, gemini, claude-hive, llama |
+
+Examples:
+- `2025-12-01-python-gpt4` - GPT-4 implementing in Python
+- `2025-12-01-python-claude-solo` - Claude Code solo (no orchestration)
+- `2025-12-01-typescript-gemini` - Gemini implementing in TypeScript
 
 ## Troubleshooting
 
 **Repo creation fails**
 - Check org permissions: `gh org list`
 - Verify template exists: `gh repo view brazil-bench/benchmark-template`
-- Check for name collision
+- Check for name collision with existing repo
 
-**Pattern not found**
-- Verify `./patterns/{pattern}/CLAUDE.md` exists
-- For custom patterns, ensure pattern_config path is valid
-- Run `ls ./patterns/` to see available patterns
+**Template is empty or missing spec**
+- Verify benchmark-template contains `brazilian-soccer-mcp-guide.md`
+- Check template repo: `gh repo view brazil-bench/benchmark-template --json description`
 
-**Issue creation fails**
-- Verify repo was created successfully
-- Check `./sops/implement-mcp.sop.md` exists
-- Verify GitHub token has issue write permissions
+**Permission denied**
+- Verify GitHub CLI is authenticated: `gh auth status`
+- Check you have write access to brazil-bench org
