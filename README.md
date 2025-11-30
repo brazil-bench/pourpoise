@@ -36,12 +36,9 @@ pip install -r requirements.txt
 
 ### MCP Server
 
-The `.mcp.json` configures the `strands-agents-sops` MCP server which provides SOP (Standard Operating Procedure) tools for Claude Code. The SOPs are located in the `./sop` directory.
+The `.mcp.json` file is included in this repository and configures the `strands-agents-sops` MCP server automatically. This server provides SOP (Standard Operating Procedure) tools for Claude Code, with SOPs located in the `./sop` directory.
 
-To use with Claude Code, ensure the MCP server is enabled:
-```bash
-claude mcp add strands-agents-sops strands-agents-sops mcp --sop-paths ./sop
-```
+No additional configuration is needed—Claude Code will detect and use the `.mcp.json` file when run from this directory.
 
 ## Usage
 
