@@ -79,7 +79,20 @@ Review implementation completeness against spec.md requirements.
 - You SHOULD note implementation approach for each
 - You MUST NOT make subjective quality judgments beyond spec compliance
 
-### 7. Generate Report
+### 7. Generate Codebase Documentation
+Generate comprehensive documentation for the implementation using the codebase-summary SOP.
+
+**Constraints:**
+- You MUST run the codebase-summary SOP on the cloned repository
+- You MUST output documentation to `{output_dir}/{attempt_repo}-summary/`
+- You SHOULD use the generated documentation to inform the final report
+- The documentation provides architecture, components, interfaces, and workflow analysis
+
+```
+/strands-agents-sops:codebase-summary codebase-path: reviews/{attempt_repo} output_dir: {output_dir}/{attempt_repo}-summary
+```
+
+### 8. Generate Report
 Produce structured evaluation output.
 
 **Constraints:**
@@ -96,6 +109,7 @@ Produce structured evaluation output.
 - **Pattern:** [swarm|hive|solo|...]
 - **Spec Compliance:** X/Y requirements
 - **Tests:** X passed, Y failed
+- **Documentation:** See `{attempt_repo}-summary/`
 
 ## Metrics
 | Metric | Value |
@@ -110,6 +124,9 @@ Produce structured evaluation output.
 - [x] Requirement 1
 - [ ] Requirement 2 (partial: notes)
 - [ ] Requirement 3 (missing)
+
+## Architecture Summary
+(Key insights from generated codebase documentation)
 
 ## Git Analysis
 ...
@@ -133,3 +150,9 @@ Produce structured evaluation output.
 - Fail the evaluation
 - Note the changes in the report
 - This invalidates the benchmark comparison
+
+**Codebase documentation fails**
+- Verify the strands-agents-sops MCP server is configured
+- Check that the codebase-path exists and contains code
+- Ensure the output directory is writable
+- Try running the SOP standalone first to debug

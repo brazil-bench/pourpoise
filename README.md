@@ -57,10 +57,51 @@ This will:
 4. Measure code metrics (LOC, files, dependencies)
 5. Extract git metrics (commits, duration, fix/revert history)
 6. Analyze implementation against spec requirements
-7. Generate a report in `results/{attempt_repo}.md`
+7. Generate codebase documentation summary
+8. Generate a report in `results/{attempt_repo}.md`
+
+### Generating Codebase Documentation
+
+To generate comprehensive documentation for a codebase (standalone or as part of evaluation), use the codebase-summary SOP:
+
+```
+/strands-agents-sops:codebase-summary codebase-path: reviews/2025-09-30-python-swarm output_dir: results/2025-09-30-python-swarm-summary
+```
+
+This generates structured documentation including:
+- `index.md` - Knowledge base index (primary context file for AI assistants)
+- `architecture.md` - System design and patterns
+- `components.md` - Component documentation
+- `interfaces.md` - API and tool documentation
+- `data_models.md` - Entity models and relationships
+- `workflows.md` - Process flows and procedures
+- `dependencies.md` - Package dependencies
+- `review_notes.md` - Documentation gaps and recommendations
+
+### Comparing Attempts (Leaderboard)
+
+To compare all evaluated attempts and generate a ranked leaderboard:
+
+```
+@sop/compare-attempts.sop.md
+```
+
+This will:
+1. Scan all evaluation reports in `results/`
+2. Extract and normalize metrics from each report
+3. Calculate composite scores based on spec compliance, efficiency, and quality
+4. Generate a ranked Top 10 leaderboard
+5. Create detailed comparison tables
+6. Output analysis and insights to `results/LEADERBOARD.md`
 
 ## Directory Structure
 
 - `sop/` - Standard Operating Procedures for evaluation tasks
-- `results/` - Evaluation reports (generated)
+  - `evaluate-attempt.sop.md` - Evaluate a single benchmark attempt
+  - `compare-attempts.sop.md` - Compare attempts and generate leaderboard
+  - `create-attempt.sop.md` - Create a new benchmark attempt
+- `results/` - Evaluation reports and documentation (generated)
+  - `LEADERBOARD.md` - Ranked comparison of all attempts
+  - `{attempt_repo}.md` - Individual evaluation report
+  - `{attempt_repo}-summary/` - Generated codebase documentation
 - `reviews/` - Cloned attempt repositories for evaluation (gitignored)
