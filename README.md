@@ -9,6 +9,17 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 
 ## Setup
 
+### Prerequisites
+
+Install GitHub CLI and authenticate:
+```bash
+# Install GitHub CLI (macOS)
+brew install gh
+
+# Authenticate with GitHub
+gh auth login
+```
+
 ### Python Environment
 
 ```bash
@@ -31,6 +42,25 @@ To use with Claude Code, ensure the MCP server is enabled:
 ```bash
 claude mcp add strands-agents-sops strands-agents-sops mcp --sop-paths ./sop
 ```
+
+## Usage
+
+### Evaluating a Benchmark Attempt
+
+To evaluate an attempt, use the evaluate-attempt SOP in Claude Code:
+
+```
+@sop/evaluate-attempt.sop.md 2025-10-30-python-hive
+```
+
+This will:
+1. Clone the attempt repository from `brazil-bench/{attempt_repo}`
+2. Verify spec integrity against the template
+3. Run conformance tests
+4. Measure code metrics (LOC, files, dependencies)
+5. Extract git metrics (commits, duration, fix/revert history)
+6. Analyze implementation against spec requirements
+7. Generate a report in `results/{attempt_repo}.md`
 
 ## Directory Structure
 
