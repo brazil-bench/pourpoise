@@ -44,10 +44,10 @@ No additional configuration is needed—Claude Code will detect and use the `.mc
 
 ### Evaluating a Benchmark Attempt
 
-To evaluate an attempt, use the evaluate-attempt SOP in Claude Code:
+To evaluate an attempt, use the evaluate-attempt SOP via the MCP server:
 
 ```
-@sop/evaluate-attempt.sop.md 2025-10-30-python-hive
+/strands-agents-sops:evaluate-attempt attempt_repo: 2025-10-30-python-hive
 ```
 
 This will:
@@ -83,7 +83,7 @@ This generates structured documentation including:
 To compare all evaluated attempts and generate a ranked leaderboard:
 
 ```
-@sop/compare-attempts.sop.md
+/strands-agents-sops:compare-attempts
 ```
 
 This will:
