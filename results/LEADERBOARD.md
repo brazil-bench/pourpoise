@@ -10,6 +10,19 @@
 | 1 🥇 | 2025-10-30-python-hive | Hive | **82.4** | 18/18 | 7,090 | 64 | ~1h 51m |
 | 2 🥈 | 2025-09-30-python-swarm | Swarm | **68.5** | 13/18 | 8,683 | 39 | ~1h 31m |
 
+## Initial Prompts
+
+Both attempts used nearly identical prompts with different orchestration commands:
+
+**Hive:** `npx claude-flow@alpha hive-mind spawn "..." --claude`
+- Spawned 4 parallel agents (researcher, coder, tester, analyst)
+
+**Swarm:** `npx claude-flow@alpha swarm "..." --claude`
+- Single sequential swarm (solo development)
+
+**Common prompt text:**
+> "Read brazilian-soccer-mcp-guide.md and implement phases 1,2 and 3 as described and test using BDD GWT structured PyTest. Use Neo4j as documented in [neo4j-setup.md], maintain a detailed context block comment at the start of every code file. Finally update README.md to describe what was done and push everything to github"
+
 ## Development Phase Comparison
 
 | Phase | Hive (Claude-Flow) | Swarm (Solo) | Notes |

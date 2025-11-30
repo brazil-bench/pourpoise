@@ -8,6 +8,14 @@
 - **Documentation:** See `2025-09-30-python-swarm-summary/`
 - **Data:** Includes 96MB real Kaggle data (12 CSV files)
 
+## Initial Prompt (from prompts.txt)
+
+```bash
+npx claude-flow@alpha swarm "Read brazilian-soccer-mcp-guide.md and implement phases 1,2 and 3 as described and test using BDD GWT structured PyTest. Use Neo4j as documented in docs/neo4j-setup.md, maintain a detailed context block comment at the start of every code file. Finally update README.md to describe what was done and push everything to github" --claude
+```
+
+This ran as a single sequential swarm (solo development pattern).
+
 ## Metrics
 
 | Metric | Value |

@@ -116,7 +116,24 @@ Break down development duration into distinct phases for each attempt.
 | Tests Working | Test fixing iterations | Commits from implementation to "100% pass" |
 | Human Intervention | Post-completion changes | Commits after tests pass (data, docs, etc.) |
 
-### 7. Analyze Token Usage
+### 7. Extract Initial Prompts
+Extract the orchestration command and prompt used to start each attempt.
+
+**Constraints:**
+- You MUST check for prompts.txt in each attempt's cloned repository
+- You MUST search for `npx claude-flow@alpha` commands (hive-mind spawn, swarm, etc.)
+- You MUST extract the full prompt text in quotes
+- You MUST identify the orchestration pattern from the command
+- You SHOULD note if prompts are identical across attempts (controlled experiment)
+
+**Command Patterns:**
+| Command | Pattern | Description |
+|---------|---------|-------------|
+| `hive-mind spawn "..." --claude` | Hive | Multi-agent parallel execution |
+| `swarm "..." --claude` | Swarm | Sequential solo development |
+| Direct Claude Code | Solo | No orchestration framework |
+
+### 8. Analyze Token Usage
 Extract and compare token consumption from prompts.txt files.
 
 **Constraints:**
@@ -135,7 +152,7 @@ Extract and compare token consumption from prompts.txt files.
 | Sessions/Agents | Count of "Done" entries | Parallel vs sequential |
 | Tokens per LOC | Total tokens / Lines of Code | Efficiency measure |
 
-### 8. Generate Analysis
+### 9. Generate Analysis
 Provide insights from the comparison.
 
 **Constraints:**
@@ -147,7 +164,7 @@ Provide insights from the comparison.
 - You SHOULD identify areas where all attempts struggled
 - You MUST NOT make subjective quality judgments beyond metrics
 
-### 9. Write Comparison Report
+### 10. Write Comparison Report
 Output the final comparison document.
 
 **Constraints:**
@@ -173,6 +190,19 @@ Output the final comparison document.
 | 2 🥈 | {name} | {pattern} | {score} | {X/Y} | {loc} | {tests} | {duration} |
 | 3 🥉 | {name} | {pattern} | {score} | {X/Y} | {loc} | {tests} | {duration} |
 | 4 | ... | ... | ... | ... | ... | ... | ... |
+
+## Initial Prompts
+
+{Note whether prompts are identical or different across attempts}
+
+**{attempt1}:** `npx claude-flow@alpha {command} "..." --claude`
+- {Description of orchestration pattern}
+
+**{attempt2}:** `npx claude-flow@alpha {command} "..." --claude`
+- {Description of orchestration pattern}
+
+**Common prompt text:** (if applicable)
+> "{The shared prompt text}"
 
 ## Development Phase Comparison
 
