@@ -1,3 +1,10 @@
+---
+name: create-attempt
+description: This SOP creates a new brazil-bench attempt repository from the template. The repository provides a clean starting point for evaluating any LLM or agent framework against the Brazilian Soccer MCP benchmark task.
+type: anthropic-skill
+version: "1.0"
+---
+
 # Create Benchmark Attempt
 
 ## Overview

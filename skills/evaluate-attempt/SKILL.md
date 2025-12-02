@@ -1,3 +1,10 @@
+---
+name: evaluate-attempt
+description: This SOP evaluates a completed brazil-bench attempt against the spec.md requirements, capturing metrics for comparison across orchestration patterns.
+type: anthropic-skill
+version: "1.0"
+---
+
 # Evaluate Benchmark Attempt
 
 ## Overview
