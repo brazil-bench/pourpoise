@@ -2,7 +2,7 @@
   "mcpServers": {
     "strands-agents-sops": {
       "command": "strands-agents-sops",
-      "args": ["mcp", "--sop-paths", "./sop"]
+      "args": ["mcp", "--sop-paths", "./sop:./venv/lib/python3.13/site-packages/strands_agents_sops/sops"]
     }
   }
 }
