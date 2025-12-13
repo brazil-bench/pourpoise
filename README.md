@@ -10,21 +10,24 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 
 ## Current Leaderboard
 
-> 3 attempts evaluated as of 2025-12-01
+> 5 attempts evaluated as of 2025-12-13
 
-| Rank | Attempt | Pattern | Data Strategy | Score | Spec | Autonomous |
-|------|---------|---------|---------------|-------|------|------------|
-| 1 🥇 | 2025-10-30-python-hive | Hive | Simulated | **90.1** | 18/18 | ~41 min |
-| 2 🥈 | 2025-12-01-python-claude-beads | Beads | Real Kaggle | **85.2** | 16/17 | ~17.5 min |
-| 3 🥉 | 2025-09-30-python-swarm | Swarm | Real Kaggle | **72.4** | 16/18 | ~91 min |
+| Rank | Attempt | Pattern | Duration | LOC | Compliance | Fix Commits |
+|------|---------|---------|----------|-----|------------|-------------|
+| 🥇 | 2025-12-01-python-claude-beads | Beads | ~11 min | 1,826 | 12/16 | 0 |
+| 🥈 | 2025-12-13-python-claude-hive | Hive Mind v2 | ~37 min | 6,165 | 13/16 | 0 |
+| 🥉 | 2025-10-30-python-hive | Hive Mind v1 | ~41 min | 3,545 | 15/16 | 1 |
+| 4 | 2025-09-30-python-swarm | Swarm v1 | ~1h 49m | 8,683 | 14/16 | 7 |
+| 5 | 2025-12-13-python-claude-swarm | Swarm v2 | ~1h 54m | 4,227 | 10/16 | 0 |
 
 See [results/LEADERBOARD.md](results/LEADERBOARD.md) for detailed analysis.
 
 ### Key Insights
 
-- **Fastest:** Beads (~17.5 min autonomous, 0 fix commits)
-- **Most Complete:** Hive (100% spec compliance, 64 BDD tests)
-- **Best Real Data:** Swarm (96MB Kaggle data integrated)
+- **Fastest:** Beads (~11 min autonomous, 0 fix commits)
+- **Most Complete:** Hive Mind v1 (94% spec compliance, 64 BDD tests)
+- **Best Real Data:** Swarm v1 (96MB Kaggle data integrated)
+- **Cleanest:** Beads, Hive v2, Swarm v2 (0 fix commits each)
 
 ## Setup
 
@@ -35,7 +38,7 @@ See [results/LEADERBOARD.md](results/LEADERBOARD.md) for detailed analysis.
 npm install -g @anthropic-ai/claude-code
 
 Install GitHub CLI and authenticate:
-# Install GitHub CLI (macOS)
+# Install GitHub CLI (needed on macOS, but it's better to run on Codespaces that doesn't need gh setup)
 brew install gh
 
 # Authenticate with GitHub
@@ -62,7 +65,6 @@ This repository includes skills in the `skills/` directory that provide Standard
 
 | Skill | Description | Example |
 |-------|-------------|---------|
-| `create-attempt` | Create a new benchmark attempt repository | "create attempt 2025-12-01-python-gpt4" |
 | `evaluate-attempt` | Evaluate a completed attempt | "evaluate attempt 2025-10-30-python-hive" |
 | `compare-attempts` | Generate leaderboard comparing all attempts | "compare attempts" |
 | `codebase-summary` | Generate documentation for a codebase | "summarize codebase reviews/attempt-name" |
@@ -76,7 +78,7 @@ Skills are invoked using natural language in Claude Code.
 
 ### Environment Setup
 
-**Pourpoise (this repo):** Can be run from a laptop. Used for creating attempts, running evaluations, and generating leaderboards.
+**Pourpoise (this repo):** Can be run from a laptop for generating leaderboards, but the evaluations will partially fail as the tests work on Linux but the database setup doesn't work the same way on MacOS. Best to run in a Codespace.
 
 **Attempt repositories:** Should be run in a GitHub Codespace for safety and consistency:
 1. Open the attempt repo in a Codespace
@@ -91,17 +93,13 @@ This isolation ensures:
 
 ### Creating a New Benchmark Attempt
 
-To create a new attempt repository for any LLM evaluation:
+To create a new attempt repository, use the GitHub web UI:
 
-The create attempt SOP doesn't have permission to create a new repo from within Codespaces, so this doesn't work there, create from the template by hand using the github web UI instead.
-```
-> create attempt 2025-12-01-python-gpt4
-```
-
-This will:
-1. Create a new repo from the benchmark-template
-2. Verify the spec file is present
-3. Provide instructions for running the benchmark
+1. Go to https://github.com/brazil-bench/benchmark-template
+2. Click "Use this template" → "Create a new repository"
+3. Name the repo following the convention: `YYYY-MM-DD-{language}-{description}`
+4. Set the owner to `brazil-bench`
+5. Create the repository
 
 **Naming convention:** `YYYY-MM-DD-{language}-{description}`
 - `2025-12-01-python-gpt4` - GPT-4 implementing in Python
@@ -109,7 +107,8 @@ This will:
 - `2025-12-01-typescript-claude` - Claude in TypeScript
 
 After creating the repo, launch a new Codespace, install your LLM of choice and, run with a prompt like:
-> "Read brazilian-soccer-mcp-guide.md and implement phases 1, 2, and 3 as described. Test using BDD PyTest. Use Neo4j for the graph database."
+> npx claude-flow@alpha hive-mind spawn "Read brazilian-soccer-mcp-guide.md and implement phases 1,2 and 3 as described and test using BDD GWT structured PyTest. Use Neo4j as documented in NEO4J_SETUP.md, maintain a detailed context block comment at the start of every code file. Finally update README.md to describe what was done and push everything to github" --claude
+
 
 **Important:** Save your initial command and prompts to `prompts.txt` for evaluation.
 
@@ -197,7 +196,6 @@ Where:
 ## Directory Structure
 
 - `skills/` - Claude Code skills for benchmark management
-  - `create-attempt/` - Create a new benchmark attempt
   - `evaluate-attempt/` - Evaluate a single benchmark attempt
   - `compare-attempts/` - Compare attempts and generate leaderboard
   - `codebase-summary/` - Generate codebase documentation
