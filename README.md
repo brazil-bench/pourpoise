@@ -30,8 +30,11 @@ See [results/LEADERBOARD.md](results/LEADERBOARD.md) for detailed analysis.
 
 ### Prerequisites
 
-Install GitHub CLI and authenticate:
 ```bash
+# Install Claude-code
+npm install -g @anthropic-ai/claude-code
+
+Install GitHub CLI and authenticate:
 # Install GitHub CLI (macOS)
 brew install gh
 
@@ -90,8 +93,9 @@ This isolation ensures:
 
 To create a new attempt repository for any LLM evaluation:
 
+The create attempt SOP doesn't have permission to create a new repo from within Codespaces, so this doesn't work there, create from the template by hand using the github web UI instead.
 ```
-create attempt 2025-12-01-python-gpt4
+> create attempt 2025-12-01-python-gpt4
 ```
 
 This will:
@@ -104,7 +108,7 @@ This will:
 - `2025-12-01-python-gemini` - Gemini in Python
 - `2025-12-01-typescript-claude` - Claude in TypeScript
 
-After creating, run your LLM with a prompt like:
+After creating the repo, launch a new Codespace, install your LLM of choice and, run with a prompt like:
 > "Read brazilian-soccer-mcp-guide.md and implement phases 1, 2, and 3 as described. Test using BDD PyTest. Use Neo4j for the graph database."
 
 **Important:** Save your initial command and prompts to `prompts.txt` for evaluation.
@@ -114,7 +118,7 @@ After creating, run your LLM with a prompt like:
 To evaluate an attempt, use the evaluate-attempt skill:
 
 ```
-evaluate attempt 2025-10-30-python-hive
+> evaluate attempt 2025-10-30-python-hive
 ```
 
 This will:
@@ -149,7 +153,7 @@ The evaluation identifies development phases:
 To generate comprehensive documentation for a codebase:
 
 ```
-summarize codebase reviews/2025-09-30-python-swarm
+> summarize codebase reviews/2025-09-30-python-swarm
 ```
 
 This generates structured documentation including:
@@ -167,7 +171,7 @@ This generates structured documentation including:
 To compare all evaluated attempts and generate a ranked leaderboard:
 
 ```
-compare attempts
+> compare attempts
 ```
 
 This will:
