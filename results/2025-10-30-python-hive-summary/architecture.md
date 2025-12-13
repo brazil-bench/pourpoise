@@ -1,107 +1,79 @@
-# System Architecture
+# Architecture - 2025-10-30-python-hive
 
 ## Overview
 
-The 2025-10-30-python-hive implementation uses the **Hive orchestration pattern** with Claude-Flow, implementing the SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) methodology.
+This implementation uses a **Hive Mind Pattern** with Claude Flow orchestration. Four specialized agents worked in parallel:
+- **Researcher** - Schema design and data model
+- **Coder** - MCP server implementation
+- **Tester** - BDD test suite creation
+- **Analyst** - Documentation and analysis
 
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        Claude[Claude AI]
-        MCP[MCP Protocol]
-    end
+## System Components
 
-    subgraph "Server Layer"
-        FastMCP[FastMCP Server]
-        Tools[Tool Handlers]
-    end
-
-    subgraph "Data Layer"
-        Neo4j[(Neo4j Database)]
-        Models[Entity Models]
-    end
-
-    Claude --> MCP
-    MCP --> FastMCP
-    FastMCP --> Tools
-    Tools --> Neo4j
-    Tools --> Models
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Claude AI (MCP Client)                       │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼ MCP Protocol
+┌─────────────────────────────────────────────────────────────────┐
+│                    MCP Server (FastMCP)                          │
+│  ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌─────────────────┐ │
+│  │ Player    │ │ Team      │ │ Match     │ │ Competition     │ │
+│  │ Tools     │ │ Tools     │ │ Tools     │ │ Tools           │ │
+│  └───────────┘ └───────────┘ └───────────┘ └─────────────────┘ │
+│                    ┌─────────────────────┐                      │
+│                    │   Analysis Tools    │                      │
+│                    └─────────────────────┘                      │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼ Cypher Queries
+┌─────────────────────────────────────────────────────────────────┐
+│                    Neo4j Graph Database                          │
+│  Nodes: Player, Team, Match, Competition, Stadium, Coach        │
+│  Relationships: PLAYS_FOR, SCORED_IN, COMPETED_IN, etc.         │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Hive Pattern Characteristics
+## Directory Structure
 
-The Hive pattern uses Claude-Flow for agent orchestration:
-
-1. **Parallel Agent Execution:** Multiple agents work concurrently
-2. **SPARC Methodology:** Systematic development phases
-3. **Memory Coordination:** Shared context via Hive Mind
-4. **Hook System:** Pre/post task coordination
-
-## Design Patterns
-
-### 1. FastMCP Server Pattern
-Modern async MCP implementation using FastMCP framework:
-- Decorator-based tool registration (`@server.call_tool()`)
-- Async/await for non-blocking operations
-- Structured error handling
-
-### 2. Repository Pattern
-Database operations abstracted through `Neo4jConnection`:
-- Connection pooling and session management
-- Async query execution
-- Health checks and monitoring
-
-### 3. Tool Module Pattern
-Tools organized by domain:
 ```
-src/tools/
-├── player_tools.py     # Player queries
-├── team_tools.py       # Team queries
-├── match_tools.py      # Match queries
-├── competition_tools.py # Competition queries
-└── analysis_tools.py   # Analysis queries
+src/
+├── __init__.py
+├── config.py          # Pydantic settings configuration
+├── database.py        # Neo4j connection management
+├── models.py          # Pydantic data models
+├── server.py          # Main MCP server
+└── tools/
+    ├── __init__.py
+    ├── player_tools.py
+    ├── team_tools.py
+    ├── match_tools.py
+    ├── competition_tools.py
+    └── analysis_tools.py
+
+tests/
+├── features/          # BDD feature files
+│   ├── player.feature
+│   ├── team.feature
+│   ├── match.feature
+│   ├── competition.feature
+│   └── analysis.feature
+└── step_defs/         # Step definitions
 ```
+
+## Key Design Decisions
+
+1. **FastMCP Framework**: Uses FastMCP for cleaner MCP protocol implementation
+2. **Pydantic Models**: Type-safe models with Field validators
+3. **Modular Tools**: Separate tool modules by domain (player, team, match, etc.)
+4. **Async Throughout**: Full async/await for database operations
+5. **Docker Neo4j**: Simple docker-compose setup for database
+6. **BDD Testing**: Given-When-Then structured tests with pytest-bdd
 
 ## Data Flow
 
-```mermaid
-sequenceDiagram
-    participant C as Claude
-    participant S as FastMCP Server
-    participant T as Tool Module
-    participant D as Neo4j
-
-    C->>S: MCP Tool Call
-    S->>T: Route to Handler
-    T->>D: Cypher Query
-    D-->>T: Results
-    T->>T: Format Response
-    T-->>S: TextContent
-    S-->>C: MCP Response
-```
-
-## Graph Database Schema
-
-```mermaid
-erDiagram
-    PLAYER ||--o{ PLAYS_FOR : has
-    PLAYER ||--o{ SCORED_IN : scored
-    PLAYER ||--o{ ASSISTED_IN : assisted
-    PLAYER ||--o{ TRANSFERRED : moved
-    TEAM ||--o{ PLAYS_FOR : employs
-    TEAM ||--o{ COMPETED_IN : played
-    TEAM ||--o{ MANAGES : coached
-    MATCH ||--o{ COMPETED_IN : involves
-    MATCH ||--o{ PART_OF : belongs
-    MATCH ||--o{ PLAYED_AT : venue
-    COMPETITION ||--o{ PART_OF : contains
-    COACH ||--o{ MANAGES : leads
-```
-
-## Key Architectural Decisions
-
-1. **FastMCP over raw MCP:** Simplified server implementation
-2. **Async throughout:** Non-blocking database operations
-3. **Pydantic models:** Type-safe configuration and validation
-4. **BDD testing:** Gherkin scenarios for specification compliance
-5. **Domain-based tool organization:** Clear separation of concerns
+1. **MCP Request** → Server receives tool call
+2. **Tool Dispatch** → Routes to appropriate tool module
+3. **Cypher Query** → Generates and executes Neo4j query
+4. **Response** → Formats and returns structured data

@@ -1,191 +1,170 @@
 # Brazil-Bench Leaderboard
 
-> Last updated: 2025-12-01
-> Attempts evaluated: 3
+## Evaluated Attempts
 
-## 🏆 Top 10 Leaderboard
+| Rank | Attempt | Pattern | Duration | LOC | Tests | Compliance |
+|------|---------|---------|----------|-----|-------|------------|
+| 🥇 | 2025-12-01-python-claude-beads | Beads | **~11 min** | **1,826** | 18 BDD | 12/16 |
+| 🥈 | 2025-10-30-python-hive | Hive Mind | ~41 min | 3,545 | **64 BDD** | **15/16** |
+| 🥉 | 2025-09-30-python-swarm | Swarm | ~1h 49m | 8,683 | 15 E2E | 14/16 |
 
-| Rank | Attempt | Pattern | Data Strategy | Score | Spec | LOC | Tests | Autonomous |
-|------|---------|---------|---------------|-------|------|-----|-------|------------|
-| 1 🥇 | 2025-10-30-python-hive | Hive | Simulated | **90.1** | 18/18 | 3,545 | 64 | ~41 min |
-| 2 🥈 | 2025-12-01-python-claude-beads | Beads | Real Kaggle | **85.2** | 16/17 | 1,826 | 18* | ~17.5 min |
-| 3 🥉 | 2025-09-30-python-swarm | Swarm | Real Kaggle | **72.4** | 16/18 | 8,683 | 39 | ~91 min |
+## Detailed Comparison
 
-*Tests cannot be verified without Neo4j
+### Efficiency Metrics
 
-## Data Strategy Assessment
+| Metric | Beads | Hive Mind | Swarm | Best |
+|--------|-------|-----------|-------|------|
+| **Autonomous Duration** | ~11 min | ~41 min | ~1h 49m | Beads (10x faster) |
+| **Lines of Code** | 1,826 | 3,545 | 8,683 | Beads (4.8x leaner) |
+| **Python Files** | 14 | 21 | 53 | Beads (3.8x fewer) |
+| **Dependencies** | 8 | 18 | 32 | Beads (4x fewer) |
+| **Total Commits** | 7 | 7 | 32 | Tie (Beads/Hive) |
+| **Fix Commits** | 0 | 1 | 7 | Beads (zero rework) |
 
-A key differentiator between attempts is whether they use **simulated/sample data** or integrate with **real external data sources** (Kaggle).
+### Quality Metrics
 
-| Attempt | Data Strategy | Data Size | Data Sources |
-|---------|---------------|-----------|--------------|
-| **Hive** | Simulated | ~10KB | `docs/sample-data.json` |
-| **Beads** | Real Kaggle | Loader only | Brasileirao, FIFA player CSVs |
-| **Swarm** | Real Kaggle | 96MB | 12 CSV files (FIFA 2015-2022, matches) |
+| Metric | Beads | Hive Mind | Swarm | Best |
+|--------|-------|-----------|-------|------|
+| **Spec Compliance** | 12/16 | 15/16 | 14/16 | Hive Mind |
+| **MCP Tools** | 12 | 15 | 13 | Hive Mind |
+| **BDD Scenarios** | 18 | 64 | 15 E2E | Hive Mind |
+| **Test Pass Rate** | 100% | 100% | 100% | Tie |
+| **Clean Implementation** | Yes | Yes | No | Beads/Hive |
 
-**Implications:**
-- Simulated data allows exact spec matching but doesn't test real-world data handling
-- Real data implementations must handle encoding, normalization, and missing fields
-- Spec compliance is now measured as **schema implementation** not just data population
+### Pattern Characteristics
 
-## Development Duration Comparison
+| Pattern | Coordination | Agents | Approach |
+|---------|--------------|--------|----------|
+| **Beads** | Issue tracking | Single (Claude 4.5) | Sequential issue resolution |
+| **Hive Mind** | Claude Flow | 4 parallel | Researcher, Coder, Tester, Analyst |
+| **Swarm** | Claude Flow | 64 available | Dynamic swarm coordination |
 
-| Phase | Hive | Beads | Swarm | Notes |
-|-------|------|-------|-------|-------|
-| **Setup (Human)** | ~3 min | ~3.5 min | N/A | Initial repo setup |
-| **Agent Implementation** | ~41 min | ~17.5 min | ~91 min | Core implementation |
-| **Test Iteration** | Included | 0 min | Included | Fix commits: 1/0/7 |
-| **Total Autonomous** | **~41 min** | **~17.5 min** | **~91 min** | Agent work only |
-| **Human Intervention** | None | None | Oct 1+ | Swarm had data additions |
+## Efficiency Rankings
 
-### Key Observations
+### Speed (Autonomous Duration)
+1. 🥇 **Beads**: ~11 min (core implementation)
+2. 🥈 **Hive Mind**: ~41 min (3.7x slower)
+3. 🥉 **Swarm**: ~1h 49m (10x slower)
 
-- **Beads** achieved fastest autonomous completion (~17.5 min) with zero fix commits
-- **Hive** used parallel agents but similar overall time (~41 min)
-- **Swarm** had most iteration (7 fix commits) but included real data integration
+### Code Efficiency (LOC)
+1. 🥇 **Beads**: 1,826 lines
+2. 🥈 **Hive Mind**: 3,545 lines (1.9x more)
+3. 🥉 **Swarm**: 8,683 lines (4.8x more)
 
-## Spec Compliance Details
+### Implementation Quality (Fix Commits)
+1. 🥇 **Beads**: 0 fix commits
+2. 🥈 **Hive Mind**: 1 fix commit
+3. 🥉 **Swarm**: 7 fix commits
 
-With the updated evaluation methodology distinguishing **schema implementation** from **data population**:
+## Completeness Rankings
 
-| Attempt | Schema Compliance | Data Population | Notes |
-|---------|-------------------|-----------------|-------|
-| **Hive** | 18/18 (100%) | Simulated | Complete with sample data |
-| **Beads** | 16/17 (94%) | Real Kaggle | Missing PLAYED_IN relationship |
-| **Swarm** | 16/18 (89%) | Real Kaggle + 96MB | Missing analysis tools |
+### Spec Compliance
+1. 🥇 **Hive Mind**: 15/16 requirements
+2. 🥈 **Swarm**: 14/16 requirements
+3. 🥉 **Beads**: 12/16 requirements
 
-## Token Usage Comparison
+### Test Coverage
+1. 🥇 **Hive Mind**: 64 BDD scenarios
+2. 🥈 **Beads**: 18 BDD scenarios
+3. 🥉 **Swarm**: 15 E2E tests
 
-> ⚠️ **Note:** Token counts are from manually captured prompts.txt files and may not be complete or accurate.
+### MCP Tool Coverage
+1. 🥇 **Hive Mind**: 15 tools
+2. 🥈 **Swarm**: 13 tools
+3. 🥉 **Beads**: 12 tools
 
-| Metric | Hive | Swarm | Beads | Notes |
-|--------|------|-------|-------|-------|
-| **Total Tokens** | ~288k | ~687k | N/A | Hive 2.4x more efficient |
-| **Tool Uses** | 99 | 213 | N/A | Hive fewer iterations |
-| **Sessions/Agents** | 4 (parallel) | 7 (sequential) | N/A | Different patterns |
+## Trade-off Analysis
 
-## Detailed Metrics Comparison
+### Beads (Most Efficient)
+**Pros:**
+- Fastest implementation by far
+- Leanest codebase
+- Zero rework needed
+- Modern Python 3.12
+- Simple architecture
 
-| Metric | Hive | Beads | Swarm | Winner |
-|--------|------|-------|-------|--------|
-| **Pattern** | Multi-agent parallel | Solo + issue tracking | Solo sequential | - |
-| **Schema Compliance** | 18/18 (100%) | 16/17 (94%) | 16/18 (89%) | 🏆 Hive |
-| **Lines of Code (src)** | 3,545 | 1,826 | 8,683 | 🏆 Beads |
-| **Autonomous Duration** | ~41 min | ~17.5 min | ~91 min | 🏆 Beads |
-| **Fix Commits** | 1 | 0 | 7 | 🏆 Beads |
-| **Test Scenarios** | 64 | 18 | 39 | 🏆 Hive |
-| **Real Data** | No | Loader | Yes (96MB) | 🏆 Swarm |
-| **Token Usage** | ~288k | N/A | ~687k | 🏆 Hive |
+**Cons:**
+- Fewer MCP tools
+- Lower spec compliance
+- Fewer test scenarios
 
-## Requirements Coverage Matrix
+**Best for:** Quick prototypes, demos, time-constrained benchmarks
 
-| Requirement | Hive | Beads | Swarm | Coverage |
-|-------------|------|-------|-------|----------|
-| **Player Tools** | | | | |
-| search_player | ✅ | ✅ | ✅ | 100% |
-| get_player_stats | ✅ | ✅ | ✅ | 100% |
-| get_player_career | ✅ | ✅ | ✅ | 100% |
-| get_player_transfers | ✅ | ❌ | ✅ | 67% |
-| **Team Tools** | | | | |
-| search_team | ✅ | ✅ | ✅ | 100% |
-| get_team_roster | ✅ | ✅ | ✅ | 100% |
-| get_team_stats | ✅ | ✅ | ✅ | 100% |
-| get_team_history | ✅ | ❌ | ✅ | 67% |
-| **Match Tools** | | | | |
-| get_match_details | ✅ | ✅ | ✅ | 100% |
-| search_matches | ✅ | ✅ | ✅ | 100% |
-| get_head_to_head | ✅ | ✅ | ✅ | 100% |
-| get_match_scorers | ✅ | ⚠️ | ✅ | 83% |
-| **Competition Tools** | | | | |
-| get_competition_standings | ✅ | ❌ | ✅ | 67% |
-| get_competition_top_scorers | ✅ | ✅ | ⚠️ | 83% |
-| get_competition_matches | ✅ | ❌ | ⚠️ | 33% |
-| **Analysis Tools** | | | | |
-| find_common_teammates | ✅ | ✅ | ❌ | 67% |
-| get_rivalry_stats | ✅ | ✅ | ❌ | 67% |
-| find_players_by_career_path | ✅ | ❌ | ❌ | 33% |
+### Hive Mind (Most Complete)
+**Pros:**
+- Highest spec compliance
+- Most MCP tools
+- Best test coverage
+- Good efficiency balance
 
-**Legend:** ✅ Implemented | ⚠️ Partial | ❌ Missing
+**Cons:**
+- 4x more code than Beads
+- 4x slower than Beads
+- More complex setup
 
-## Analysis
+**Best for:** Production-quality implementations, comprehensive coverage
 
-### Winner: 2025-10-30-python-hive
+### Swarm (Most Comprehensive Infrastructure)
+**Pros:**
+- Extensive tooling available
+- Full infrastructure for scaling
+- Good spec compliance
 
-The Hive pattern achieved 100% spec compliance with efficient code (3,545 LOC) and comprehensive test coverage (64 BDD scenarios). Key advantages:
+**Cons:**
+- Slowest implementation
+- Most code to maintain
+- Most rework needed
+- Complex coordination
 
-1. **Complete Implementation** - All 18 spec requirements met
-2. **Parallel Development** - 4 specialized agents working concurrently
-3. **Token Efficiency** - 288k tokens vs 687k for Swarm (2.4x better)
-4. **Clean Development** - Only 1 fix commit vs 7 for Swarm
+**Best for:** Large-scale projects requiring extensive agent coordination
 
-### Notable: 2025-12-01-python-claude-beads
+## Pattern Recommendations
 
-The Beads pattern achieved the **fastest autonomous duration** (~17.5 min) with:
-- Zero fix commits (cleanest development)
-- Real Kaggle data integration capability
-- Most efficient code (1,826 LOC)
-- 94% spec compliance despite using real data constraints
+| Scenario | Recommended Pattern |
+|----------|---------------------|
+| Quick demo/prototype | **Beads** |
+| Production MCP server | **Hive Mind** |
+| Complex multi-agent system | **Swarm** |
+| Time-constrained benchmark | **Beads** |
+| Maximum test coverage | **Hive Mind** |
+| Learning/experimentation | **Beads** or **Hive Mind** |
 
-### Key Differentiators
+## Key Insights
 
-| Aspect | Hive | Beads | Swarm | Winner |
-|--------|------|-------|-------|--------|
-| Schema completeness | 18/18 (100%) | 16/17 (94%) | 16/18 (89%) | 🏆 Hive |
-| Autonomous duration | ~41 min | ~17.5 min | ~91 min | 🏆 Beads |
-| Token usage* | ~288k | N/A | ~687k | 🏆 Hive |
-| Real data integration | No | Loader | Yes (96MB) | 🏆 Swarm |
-| Test coverage | 64 | 18 | 39 | 🏆 Hive |
-| Code efficiency | 3,545 LOC | 1,826 LOC | 8,683 LOC | 🏆 Beads |
-| Fix commits | 1 | 0 | 7 | 🏆 Beads |
+1. **Parallel agents don't always mean faster**: Beads (single agent) was 10x faster than Swarm (64 agents available).
 
-*Token counts from manually captured prompts.txt, may be incomplete
+2. **Less code can mean more focus**: Beads' minimal approach avoided rework entirely.
 
-### Pattern Insights
+3. **Test quantity vs implementation time**: Hive Mind achieved 64 tests in 41 min, while Swarm managed only 15 in 109 min.
 
-- **Best spec compliance:** Hive (100%)
-- **Fastest development:** Beads (~17.5 min)
-- **Most code-efficient:** Beads (1,826 LOC)
-- **Most token-efficient:** Hive (~81 tokens per LOC)
-- **Cleanest development:** Beads (0 fix commits)
-- **Best real data integration:** Swarm (96MB Kaggle data)
+4. **Coordination overhead matters**: Swarm's complex coordination led to more fix commits and longer duration.
 
-## Scoring Methodology
+5. **Issue-driven development works**: Beads' simple issue tracking proved highly effective for AI coordination.
 
-### Formula
+## Visualizations
+
+### Duration Comparison
 ```
-Score = (Spec Compliance % × 40) + (Test Score × 20) + (Efficiency × 20) + (Quality × 20)
-
-Where:
-- Spec Compliance % = (implemented / total) × 100
-- Test Coverage Score = min(100, test_scenarios × 1.5)
-- Efficiency Score = 100 - min(100, LOC / 100)
-- Code Quality Score = 100 - (fix_commits × 10)
+Beads:     ████ (~11 min)
+Hive Mind: ████████████████ (~41 min)
+Swarm:     ████████████████████████████████████████ (~109 min)
 ```
 
-### Score Breakdown
+### Lines of Code
+```
+Beads:     ██ (1,826)
+Hive Mind: ████ (3,545)
+Swarm:     █████████ (8,683)
+```
 
-| Component | Hive | Beads | Swarm | Max |
-|-----------|------|-------|-------|-----|
-| Spec (40%) | 40.0 | 37.6 | 35.6 | 40 |
-| Tests (20%) | 19.2 | 5.4* | 11.7 | 20 |
-| Efficiency (20%) | 12.9 | 16.3 | 2.6 | 20 |
-| Quality (20%) | 18.0 | 20.0 | 6.0 | 20 |
-| Duration Bonus | 0 | +5.9 | +16.5 | +20 |
-| **Total** | **90.1** | **85.2** | **72.4** | 120 |
-
-*Beads tests cannot be verified, partial credit given
-*Duration bonus: faster autonomous = higher bonus
-
-## Data Sources
-
-| Attempt | Report | Documentation |
-|---------|--------|---------------|
-| 2025-10-30-python-hive | `results/2025-10-30-python-hive.md` | `results/2025-10-30-python-hive-summary/` |
-| 2025-12-01-python-claude-beads | `results/2025-12-01-python-claude-beads.md` | `reviews/2025-12-01-python-claude-beads/.sop/summary/` |
-| 2025-09-30-python-swarm | `results/2025-09-30-python-swarm.md` | `results/2025-09-30-python-swarm-summary/` |
+### Fix Commits (Lower is Better)
+```
+Beads:     (0)
+Hive Mind: █ (1)
+Swarm:     ███████ (7)
+```
 
 ---
 
-*Generated by compare-attempts SOP on 2025-12-01*
-*Updated with Data Strategy Assessment and revised scoring*
-*Duration analysis based on git commit timestamps*
+*Last updated: 2025-12-13*
+*Attempts evaluated: 3*

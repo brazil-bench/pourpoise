@@ -1,120 +1,73 @@
-# System Architecture
+# Architecture - 2025-09-30-python-swarm
 
 ## Overview
 
-The Brazilian Soccer MCP Knowledge Graph follows a layered architecture designed for extensibility and separation of concerns.
+This implementation uses a **Swarm Pattern** with Claude Flow orchestration to build a Brazilian Soccer MCP Knowledge Graph server.
 
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        Claude[Claude AI]
-        CLI[CLI Interface]
-    end
+## System Components
 
-    subgraph "MCP Server Layer"
-        Server[MCP Server]
-        Tools[Tool Handlers]
-        Cache[Query Cache]
-    end
-
-    subgraph "Data Access Layer"
-        DB[Neo4j Database]
-        Models[Graph Models]
-        Queries[Query Builders]
-    end
-
-    subgraph "Data Pipeline"
-        Loader[Kaggle Loader]
-        Builder[Graph Builder]
-    end
-
-    Claude --> Server
-    CLI --> Server
-    Server --> Tools
-    Tools --> Cache
-    Tools --> Queries
-    Queries --> DB
-    Loader --> Builder
-    Builder --> DB
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     MCP Client (Claude)                          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    MCP Server Layer                              │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌────────────┐ │
+│  │PlayerTools  │ │TeamTools    │ │MatchTools   │ │AnalysisTools│
+│  └─────────────┘ └─────────────┘ └─────────────┘ └────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Graph Database Layer                          │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐               │
+│  │  Models     │ │  Queries    │ │  Database   │               │
+│  └─────────────┘ └─────────────┘ └─────────────┘               │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         Neo4j                                    │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Design Patterns
+## Directory Structure
 
-### 1. Model Context Protocol (MCP)
-The system implements the MCP specification for Claude AI integration:
-- **Server:** Handles initialization, capability negotiation
-- **Tools:** 13 specialized query tools exposed to Claude
-- **Resources:** Schema documentation and help content
+```
+src/
+├── data_pipeline/
+│   ├── kaggle_loader.py    # Load Kaggle CSV data
+│   └── graph_builder.py    # Build Neo4j graph from data
+├── graph/
+│   ├── models.py           # Data models (Player, Team, Match, etc.)
+│   ├── database.py         # Neo4j connection management
+│   ├── queries.py          # Cypher query builders
+│   └── schema.py           # Graph schema definitions
+├── mcp_server/
+│   ├── server.py           # Main MCP server
+│   ├── http_server.py      # HTTP wrapper for testing
+│   ├── config.py           # Server configuration
+│   └── tools/
+│       ├── player_tools.py
+│       ├── team_tools.py
+│       ├── match_tools.py
+│       └── analysis_tools.py
+└── utils/
+    └── data_utils.py       # Utility functions
+```
 
-### 2. Repository Pattern
-Database access is abstracted through the `Neo4jDatabase` class:
-- Connection pooling and session management
-- Transaction support for batch operations
-- Query caching for performance
+## Key Design Decisions
 
-### 3. Builder Pattern
-Graph construction uses a systematic builder approach:
-- Entities created in dependency order
-- Batch processing for large datasets
-- Rollback capability on failure
-
-### 4. Data Transfer Objects
-Entity models use Python dataclasses:
-- Type-safe attribute definitions
-- Automatic serialization to Neo4j properties
-- Enum support for constrained values
+1. **Neo4j Graph Database**: Uses Neo4j for storing and querying the knowledge graph
+2. **Modular Tool Architecture**: Separate tool modules for players, teams, matches, and analysis
+3. **Async Operations**: Full async/await support for database operations
+4. **Caching Layer**: 30-minute TTL cache for frequently accessed data
+5. **Pydantic Models**: Type-safe data models with validation
 
 ## Data Flow
 
-```mermaid
-sequenceDiagram
-    participant C as Claude
-    participant S as MCP Server
-    participant T as Tool Handler
-    participant D as Neo4j
-
-    C->>S: Tool Call (e.g., search_player)
-    S->>T: Route to PlayerTools
-    T->>D: Execute Cypher Query
-    D-->>T: Query Results
-    T->>T: Format Response
-    T-->>S: Structured Data
-    S-->>C: JSON Response
-```
-
-## Graph Database Schema
-
-```mermaid
-erDiagram
-    PLAYER ||--o{ PLAYS_FOR : has
-    PLAYER ||--o{ SCORED : made
-    PLAYER ||--o{ RECEIVED : got
-    TEAM ||--o{ PLAYS_FOR : employs
-    TEAM ||--o{ HOME_TEAM : is
-    TEAM ||--o{ AWAY_TEAM : is
-    TEAM ||--o{ PLAYS_AT : uses
-    MATCH ||--o{ HOME_TEAM : has
-    MATCH ||--o{ AWAY_TEAM : has
-    MATCH ||--o{ PART_OF : belongs
-    MATCH ||--o{ PLAYED_AT : location
-    COMPETITION ||--o{ PART_OF : contains
-    STADIUM ||--o{ PLAYS_AT : hosts
-    STADIUM ||--o{ PLAYED_AT : venue
-```
-
-## Performance Considerations
-
-| Aspect | Strategy |
-|--------|----------|
-| Query Caching | 30-minute TTL in-memory cache |
-| Connection Pooling | Max 50 connections |
-| Batch Operations | 1000 records per batch |
-| Indexing | Indexes on frequently queried properties |
-| Constraints | Unique constraints on entity IDs |
-
-## Error Handling Strategy
-
-1. **Connection Errors:** Automatic reconnection with exponential backoff
-2. **Query Errors:** Logged with full context, graceful degradation
-3. **Tool Errors:** Returned as structured error messages to Claude
-4. **Validation Errors:** Pre-execution parameter validation
+1. **Data Loading**: Kaggle CSV files → kaggle_loader.py → Neo4j
+2. **Query Processing**: MCP request → Tool module → Cypher query → Neo4j → Response
+3. **Caching**: Results cached in memory with TTL for performance
