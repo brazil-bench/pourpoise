@@ -107,7 +107,7 @@ To create a new attempt repository, use the GitHub web UI:
 - `2025-12-01-typescript-claude` - Claude in TypeScript
 
 After creating the repo, launch a new Codespace, install your LLM of choice and, run with a prompt like:
-> npx claude-flow@alpha hive-mind spawn "Read brazilian-soccer-mcp-guide.md and implement phases 1,2 and 3 as described and test using BDD GWT structured PyTest. Use Neo4j as documented in NEO4J_SETUP.md, maintain a detailed context block comment at the start of every code file. Finally update README.md to describe what was done and push everything to github" --claude
+> npx claude-flow@alpha hive-mind spawn "Read brazilian-soccer-mcp-guide.md and implement phases 1,2 and 3 as described and test using BDD GWT structured PyTest. Use Neo4j. maintain a detailed context block comment at the start of every code file. Finally update README.md to describe what was done and push everything to github" --claude
 
 
 **Important:** Save your initial command and prompts to `prompts.txt` for evaluation.
