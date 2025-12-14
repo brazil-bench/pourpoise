@@ -4,7 +4,7 @@ Purpose management for this organization
 
 The purpose of this organization is to generate benchmark results that compare approaches to agent development management on the same task.
 
-The standard task is to create an MCP server for a brazilian football statistics knowledge graph, and every benchmark starts with an empty repo that contains the spec, which is created from the benchmark-template repo provided here.
+The standard task is to create an MCP server for a brazilian football statistics knowledge graph, and every benchmark starts with an empty repo that contains the spec, which is created from the benchmark-template repo provided here. The spec works well enough, but has some inconsistencies with the provided sample data, which are deliberately left in the task to see how the agent deals with the ambiguity. The time taken is approximate as it's estimated based on the github check-in times, and is a high side estimate, as the run doesn't always start immediately after a check-in.
 
 A secondary purpose is to explore and develop mechanisms that automate the development management of agents in a purposeful way.
 
