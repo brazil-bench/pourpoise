@@ -10,24 +10,26 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 
 ## Current Leaderboard
 
-> 5 attempts evaluated as of 2025-12-13
+> 6 attempts evaluated as of 2025-12-14
 
 | Rank | Attempt | Pattern | Duration | LOC | Compliance | Fix Commits |
 |------|---------|---------|----------|-----|------------|-------------|
-| 🥇 | 2025-12-01-python-claude-beads | Beads | ~11 min | 1,826 | 12/16 | 0 |
-| 🥈 | 2025-12-13-python-claude-hive | Hive Mind v2 | ~37 min | 6,165 | 13/16 | 0 |
-| 🥉 | 2025-10-30-python-hive | Hive Mind v1 | ~41 min | 3,545 | 15/16 | 1 |
-| 4 | 2025-09-30-python-swarm | Swarm v1 | ~1h 49m | 8,683 | 14/16 | 7 |
-| 5 | 2025-12-13-python-claude-swarm | Swarm v2 | ~1h 54m | 4,227 | 10/16 | 0 |
+| 🥇 | 2025-12-01-python-claude-beads | Beads v1 | ~11 min | 1,826 | 12/16 | 0 |
+| 🥈 | 2025-12-14-python-claude-beads | Beads v2 | ~14 min | 3,511 | 14/16 | 0 |
+| 🥉 | 2025-12-13-python-claude-hive | Hive Mind v2 | ~37 min | 6,165 | 13/16 | 0 |
+| 4 | 2025-10-30-python-hive | Hive Mind v1 | ~41 min | 3,545 | 15/16 | 1 |
+| 5 | 2025-09-30-python-swarm | Swarm v1 | ~1h 49m | 8,683 | 14/16 | 7 |
+| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | ~1h 54m | 4,227 | 10/16 | 0 |
 
 See [results/LEADERBOARD.md](results/LEADERBOARD.md) for detailed analysis.
 
 ### Key Insights
 
-- **Fastest:** Beads (~11 min autonomous, 0 fix commits)
+- **Fastest:** Beads v1 (~11 min autonomous, 0 fix commits)
+- **Best Balance:** Beads v2 (~14 min, 88% compliance, 10 MCP tools)
 - **Most Complete:** Hive Mind v1 (94% spec compliance, 64 BDD tests)
 - **Best Real Data:** Swarm v1 (96MB Kaggle data integrated)
-- **Cleanest:** Beads, Hive v2, Swarm v2 (0 fix commits each)
+- **Cleanest:** Beads v1/v2, Hive v2, Swarm v2 (0 fix commits each)
 
 ## Setup
 
