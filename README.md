@@ -80,17 +80,6 @@ Skills are invoked using natural language in Claude Code.
 
 **Pourpoise (this repo):** Can be run from a laptop for generating leaderboards, but the evaluations will partially fail as the tests work on Linux but the database setup doesn't work the same way on MacOS. Best to run in a Codespace.
 
-**Attempt repositories:** Should be run in a GitHub Codespace for safety and consistency:
-1. Open the attempt repo in a Codespace
-2. Run with dangerous permissions enabled (e.g., `claude --dangerously-skip-permissions`)
-3. Let the LLM run to completion without intervention
-4. Save the prompts and commands used to `prompts.txt`
-
-This isolation ensures:
-- Consistent environment across attempts
-- Safe execution of LLM-generated code
-- No interference from local machine configuration
-
 ### Creating a New Benchmark Attempt
 
 To create a new attempt repository, use the GitHub web UI:
@@ -98,7 +87,7 @@ To create a new attempt repository, use the GitHub web UI:
 1. Go to https://github.com/brazil-bench/benchmark-template
 2. Click "Use this template" → "Create a new repository"
 3. Name the repo following the convention: `YYYY-MM-DD-{language}-{description}`
-4. Set the owner to `brazil-bench`
+4. Set the owner to `brazil-bench` and make it public
 5. Create the repository
 
 **Naming convention:** `YYYY-MM-DD-{language}-{description}`
@@ -106,15 +95,28 @@ To create a new attempt repository, use the GitHub web UI:
 - `2025-12-01-python-gemini` - Gemini in Python
 - `2025-12-01-typescript-claude` - Claude in TypeScript
 
-After creating the repo, launch a new Codespace, install your LLM of choice and, run with a prompt like:
+**Attempt repositories:** Should be run in a GitHub Codespace for safety and consistency:
+1. Open the attempt repo in a Codespace
+2. Install your LLM of choice and any other packages and frameworks
+3. Run with dangerous permissions enabled (e.g., `claude --dangerously-skip-permissions`)
+4. Let the LLM run to completion without intervention
+5. Save the prompts and commands used to `prompts.txt`
+
+This isolation ensures:
+- Consistent environment across attempts
+- Safe execution of LLM-generated code
+- No interference from local machine configuration
+
+
+**Important:** Save your setup, initial command and prompts to `prompts.txt`, which contains the following prompt as a starting point
+
+```
 > npx claude-flow@alpha hive-mind spawn "Read brazilian-soccer-mcp-guide.md and implement phases 1,2 and 3 as described and test using BDD GWT structured PyTest. Use Neo4j. maintain a detailed context block comment at the start of every code file. Finally update README.md to describe what was done and push everything to github" --claude
-
-
-**Important:** Save your initial command and prompts to `prompts.txt` for evaluation.
+```
 
 ### Evaluating a Benchmark Attempt
 
-To evaluate an attempt, use the evaluate-attempt skill:
+To evaluate an attempt, use the evaluate-attempt skill from the pourpoise repo:
 
 ```
 > evaluate attempt 2025-10-30-python-hive
