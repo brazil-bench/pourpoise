@@ -21,6 +21,20 @@
 | Commits (Agent) | 10 |
 | Commits (Human) | 22 |
 | Fix Commits | 7 |
+| Tests (Total) | 15 |
+| Tests (Passed) | 15 |
+| **Tests (Skipped)** | **0** |
+| **Effective Tests** | **15** |
+| **Skip Ratio** | **0%** |
+
+## Test Skip Analysis
+
+This attempt has **8 conditional skip patterns** for external dependencies:
+- `conftest.py`: Environment variable checks, Neo4j availability
+- `e2e/conftest.py`: Data availability, MCP server accessibility
+
+These are proper integration test guards. When tests run with dependencies available,
+**all 15 tests pass with 0 skipped**. No inflated test counts.
 
 ## Development Duration Breakdown
 

@@ -110,6 +110,90 @@ If tests cannot be run directly, document:
 - You SHOULD note the source of any claimed test results
 - You SHOULD clean up Docker containers after evaluation: `docker stop neo4j-eval && docker rm neo4j-eval`
 
+#### 3b. Detect Skipped Tests
+
+Skipped tests inflate test counts without providing actual verification. You MUST detect and report them separately.
+
+**Step 1: Run pytest with verbose output to capture skipped tests**
+```bash
+cd ./reviews/{attempt_repo}
+
+# Run pytest and capture skip count
+pytest --tb=no -v 2>&1 | grep -E "(PASSED|FAILED|SKIPPED|ERROR)" | head -100
+
+# Get summary counts
+pytest --tb=no -q 2>&1 | tail -5
+
+# Look for skip patterns in test files
+grep -r "pytest.skip\|@pytest.mark.skip\|skipif\|xfail" tests/ --include="*.py"
+```
+
+**Step 2: Analyze test files for skip patterns**
+```bash
+# Count tests that call pytest.skip() inside the test body (worst pattern)
+grep -r "pytest.skip(" tests/ --include="*.py" -l | wc -l
+
+# Count tests with @pytest.mark.skip decorator
+grep -r "@pytest.mark.skip" tests/ --include="*.py" | wc -l
+
+# Count conditional skips (skipif)
+grep -r "@pytest.mark.skipif" tests/ --include="*.py" | wc -l
+```
+
+**Step 3: Calculate effective test count**
+
+| Metric | How to Calculate |
+|--------|------------------|
+| **Total Tests** | Number of test functions defined |
+| **Passed Tests** | Tests that ran and passed |
+| **Skipped Tests** | Tests marked skip or calling pytest.skip() |
+| **Effective Tests** | Total - Skipped (tests that actually run) |
+| **Skip Ratio** | Skipped / Total (percentage of tests that skip) |
+
+**Constraints for skipped test handling:**
+- You MUST report skipped tests separately from passed tests
+- You MUST calculate the "effective test count" (passed + failed, excluding skipped)
+- You MUST flag attempts with skip ratio > 20% as having "inflated test counts"
+- You SHOULD distinguish between:
+  - **Conditional skips** (`@pytest.mark.skipif`): Acceptable for environment-specific tests
+  - **Unconditional skips** (`pytest.skip()` in body): Should be penalized - tests never run
+  - **Decorator skips** (`@pytest.mark.skip`): Acceptable if documented
+- You MUST NOT count skipped tests toward the test score in rankings
+
+**Example Analysis:**
+```
+Total tests:     59
+Passed:          44
+Skipped:         15  (25% skip ratio - HIGH)
+Failed:          0
+Effective:       44  (use this for scoring, not 59)
+
+Skip breakdown:
+- pytest.skip() in body: 15 (integration tests that never run)
+- @pytest.mark.skipif: 0
+- @pytest.mark.skip: 0
+
+Flag: INFLATED TEST COUNT - 15 tests skip unconditionally
+```
+
+**Document in Report:**
+```markdown
+## Test Results
+
+| Metric | Count |
+|--------|-------|
+| Total Tests | 59 |
+| Passed | 44 |
+| **Skipped** | **15** |
+| Failed | 0 |
+| **Effective Tests** | **44** |
+| Skip Ratio | 25% |
+
+⚠️ **Warning:** 15 tests (25%) are skipped and never execute.
+These are integration tests that call `pytest.skip()` inside the test body.
+The effective test count for scoring is 44, not 59.
+```
+
 ### 4. Measure Code Metrics
 Collect quantitative data about the implementation.
 
@@ -336,7 +420,7 @@ Produce structured evaluation output.
 ## Summary
 - **Pattern:** [swarm|hive|solo|...]
 - **Spec Compliance:** X/Y requirements
-- **Tests:** X passed, Y failed
+- **Tests:** X passed, Y skipped, Z failed (X effective)
 - **Autonomous Duration:** Xh Ym
 - **Documentation:** See `{attempt_repo}-summary/`
 
@@ -350,6 +434,11 @@ Produce structured evaluation output.
 | Commits (Agent) | |
 | Commits (Human) | |
 | Fix Commits | |
+| Tests (Total) | |
+| Tests (Passed) | |
+| Tests (Skipped) | |
+| Tests (Effective) | |
+| Skip Ratio | |
 
 ## Development Duration Breakdown
 

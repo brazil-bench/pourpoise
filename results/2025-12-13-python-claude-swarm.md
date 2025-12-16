@@ -21,6 +21,11 @@
 | Commits (Agent) | 1 |
 | Commits (Human) | 1 |
 | Fix Commits | 0 |
+| Tests (Total) | 38 |
+| Tests (Passed) | ~37 |
+| **Tests (Skipped)** | **~1** |
+| **Effective Tests** | **~37** |
+| **Skip Ratio** | **~3%** |
 
 ## Development Duration Breakdown
 

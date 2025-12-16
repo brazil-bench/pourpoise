@@ -1,294 +1,221 @@
 # Brazil-Bench Leaderboard
 
-## Evaluated Attempts
+> Last updated: 2025-12-16
+> Attempts evaluated: 8
+> Methodology: Effective Tests with Skip Penalty Scoring (v3)
 
-| Rank | Attempt | Pattern | Duration | LOC | Tests | Compliance | Fix Commits |
-|------|---------|---------|----------|-----|-------|------------|-------------|
-| 🥇 | 2025-12-01-python-claude-beads | Beads v1 | **~11 min** | **1,826** | 18 BDD | 12/16 | **0** |
-| 🥈 | 2025-12-14-python-claude-beads | Beads v2 | **~14 min** | 3,511 | 18 BDD | **14/16** | **0** |
-| 🥉 | 2025-12-13-python-claude-hive | Hive Mind v2 | ~37 min | 6,165 | 63 BDD | 13/16 | **0** |
-| 4 | 2025-10-30-python-hive | Hive Mind v1 | ~41 min | 3,545 | **64 BDD** | **15/16** | 1 |
-| 5 | 2025-09-30-python-swarm | Swarm v1 | ~1h 49m | 8,683 | 15 E2E | 14/16 | 7 |
-| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | ~1h 54m | 4,227 | 38 BDD | 10/16 | **0** |
+## Scoring Methodology
 
-## Detailed Comparison
-
-### Efficiency Metrics
-
-| Metric | Beads v1 | Beads v2 | Hive v2 | Hive v1 | Swarm v1 | Swarm v2 | Best |
-|--------|----------|----------|---------|---------|----------|----------|------|
-| **Duration** | ~11 min | ~14 min | ~37 min | ~41 min | ~1h 49m | ~1h 54m | Beads v1 |
-| **Lines of Code** | 1,826 | 3,511 | 6,165 | 3,545 | 8,683 | 4,227 | Beads v1 |
-| **Python Files** | 14 | 11 | 18 | 21 | 53 | 17 | Beads v2 |
-| **Dependencies** | 8 | 5 | 0 | 18 | 32 | 20 | Hive v2 |
-| **Total Commits** | 7 | 4 | 5 | 7 | 32 | 2 | Swarm v2 |
-| **Fix Commits** | 0 | 0 | 0 | 1 | 7 | 0 | Multiple |
-
-### Quality Metrics
-
-| Metric | Beads v1 | Beads v2 | Hive v2 | Hive v1 | Swarm v1 | Swarm v2 | Best |
-|--------|----------|----------|---------|---------|----------|----------|------|
-| **Spec Compliance** | 12/16 | 14/16 | 13/16 | 15/16 | 14/16 | 10/16 | Hive v1 |
-| **BDD Scenarios** | 18 | 18 | 63 | 64 | 15 E2E | 38 | Hive v1 |
-| **MCP Tools** | Yes | 10 tools | 0 | ? | ? | ? | Beads v2 |
-| **Real Kaggle Data** | Yes | Yes | Yes | No | Yes | Yes | 5/6 attempts |
-| **Clean Implementation** | Yes | Yes | Yes | Yes | No | Yes | 5/6 attempts |
-
-### Pattern Characteristics
-
-| Pattern | Orchestration | Agents | Key Feature |
-|---------|---------------|--------|-------------|
-| **Beads v1** | Issue tracking | Single | Fast sequential execution |
-| **Beads v2** | Issue tracking (bd CLI) | Single | Full MCP with 10 tools |
-| **Hive Mind v2** | Claude-Flow Queen | 5 parallel | Researcher, 3 Coders, Tester |
-| **Hive Mind v1** | Claude Flow | 4 parallel | Researcher, Coder, Tester, Analyst |
-| **Swarm v1** | Claude Flow | 64 available | Dynamic coordination |
-| **Swarm v2** | Claude Code | Single | Query handler pattern |
-
-## Beads Comparison (v1 vs v2)
-
-| Metric | Beads v1 (Dec 1) | Beads v2 (Dec 14) | Winner |
-|--------|------------------|-------------------|--------|
-| Duration | ~11 min | ~14 min | v1 (27% faster) |
-| LOC | 1,826 | 3,511 | v1 (48% less code) |
-| Tests | 18 BDD | 18 BDD | Tie |
-| Compliance | 12/16 | 14/16 | **v2 (higher)** |
-| Fix Commits | 0 | 0 | Tie |
-| Real Data | Yes | Yes (11 MB) | Tie |
-| MCP Tools | Yes | 10 fully exposed | **v2** |
-| Dependencies | 8 | 5 | v2 (fewer) |
-
-**Key Differences:**
-- v2 uses `bd` CLI for issue tracking with dependency chains
-- v2 has more comprehensive MCP tool implementation (10 tools)
-- v2 achieved higher spec compliance (88% vs 75%)
-- v2 has slightly larger codebase but better feature coverage
-- v2 self-corrected during development (fixed NaN handling)
-
-## Efficiency Rankings
-
-### Speed (Autonomous Duration)
-1. 🥇 **Beads v1**: ~11 min
-2. 🥈 **Beads v2**: ~14 min (1.3x slower)
-3. 🥉 **Hive Mind v2**: ~37 min (3.4x slower)
-4. 4th **Hive Mind v1**: ~41 min (3.7x slower)
-5. 5th **Swarm v1**: ~1h 49m (10x slower)
-6. 6th **Swarm v2**: ~1h 54m (10.4x slower)
-
-### Code Efficiency (LOC)
-1. 🥇 **Beads v1**: 1,826 lines
-2. 🥈 **Beads v2**: 3,511 lines (1.9x more)
-3. 🥉 **Hive Mind v1**: 3,545 lines (1.9x more)
-4. 4th **Swarm v2**: 4,227 lines (2.3x more)
-5. 5th **Hive Mind v2**: 6,165 lines (3.4x more)
-6. 6th **Swarm v1**: 8,683 lines (4.8x more)
-
-### Implementation Quality (Fix Commits)
-1. 🥇 **Beads v1**: 0 fix commits
-1. 🥇 **Beads v2**: 0 fix commits
-1. 🥇 **Hive Mind v2**: 0 fix commits
-1. 🥇 **Swarm v2**: 0 fix commits
-5. 5th **Hive Mind v1**: 1 fix commit
-6. 6th **Swarm v1**: 7 fix commits
-
-## Completeness Rankings
-
-### Spec Compliance
-1. 🥇 **Hive Mind v1**: 15/16 requirements (94%)
-2. 🥈 **Beads v2**: 14/16 requirements (88%)
-2. 🥈 **Swarm v1**: 14/16 requirements (88%)
-4. 4th **Hive Mind v2**: 13/16 requirements (81%)
-5. 5th **Beads v1**: 12/16 requirements (75%)
-6. 6th **Swarm v2**: 10/16 requirements (63%)
-
-### Test Coverage
-1. 🥇 **Hive Mind v1**: 64 BDD scenarios
-2. 🥈 **Hive Mind v2**: 63 BDD scenarios
-3. 🥉 **Swarm v2**: 38 BDD scenarios
-4. 4th **Beads v1**: 18 BDD scenarios
-4. 4th **Beads v2**: 18 BDD scenarios
-6. 6th **Swarm v1**: 15 E2E tests
-
-## Data Strategy Comparison
-
-| Attempt | Data Strategy | Data Size | Coverage |
-|---------|---------------|-----------|----------|
-| **Swarm v1** | Real Kaggle | ~96 MB | Full datasets |
-| **Swarm v2** | Real Kaggle | ~11 MB | 40,000+ records |
-| **Hive Mind v2** | Real Kaggle | ~11 MB | 42,000+ records |
-| **Beads v1** | Real Kaggle | ~11 MB | Core datasets |
-| **Beads v2** | Real Kaggle | ~11 MB | 42,161 records |
-| **Hive Mind v1** | Simulated | N/A | Test data only |
-
-## Trade-off Analysis
-
-### Beads v1 (Fastest)
-**Pros:**
-- Fastest implementation (11 min)
-- Leanest codebase (1,826 LOC)
-- Zero rework needed
-- Real Kaggle data
-
-**Cons:**
-- Fewer tests (18)
-- Lower spec compliance (75%)
-
-**Best for:** Quick prototypes, demos, time-constrained benchmarks
-
-### Beads v2 (Best Balance)
-**Pros:**
-- Very fast execution (~14 min)
-- High spec compliance (88%)
-- Full MCP implementation (10 tools)
-- Self-correcting during development
-- Real Kaggle data included
-
-**Cons:**
-- More code than v1 (3,511 vs 1,826)
-- Same test count as v1
-
-**Best for:** Production-ready MCP servers with full feature coverage
-
-### Hive Mind v2 (Balanced + Parallel)
-**Pros:**
-- Fast execution (~37 min)
-- Zero fix commits
-- Real Kaggle data included
-- High test coverage (63 BDD)
-
-**Cons:**
-- More code (6,165)
-- High token usage (~345k)
-
-**Best for:** Real data integration with parallel agents
-
-### Hive Mind v1 (Most Complete)
-**Pros:**
-- Highest spec compliance (94%)
-- Best test coverage (64 BDD)
-- Good efficiency balance
-
-**Cons:**
-- No real data integration
-- One fix commit needed
-
-**Best for:** Production-quality implementations, comprehensive coverage
-
-### Swarm v1 (Most Infrastructure)
-**Pros:**
-- Good spec compliance (88%)
-- Real Kaggle data (96 MB)
-
-**Cons:**
-- Most code (8,683 LOC)
-- Most rework (7 fix commits)
-
-**Best for:** Learning swarm patterns, extensive tooling needs
-
-### Swarm v2 (Cleanest Swarm)
-**Pros:**
-- Zero fix commits
-- Real Kaggle data included
-
-**Cons:**
-- Lowest spec compliance (63%)
-- Slowest implementation
-
-**Best for:** When clean implementation is priority over features
-
-## Key Insights
-
-1. **Beads dominates speed**: Both v1 (~11 min) and v2 (~14 min) are 3-10x faster than multi-agent patterns.
-
-2. **Beads v2 improves compliance**: v2 achieved 88% compliance vs v1's 75% with full MCP tool exposure.
-
-3. **Hive Mind patterns excel at testing**: Both Hive v1 (64 tests) and v2 (63 tests) lead in test coverage.
-
-4. **Real data vs compliance trade-off persists**: Hive Mind v1 (simulated data) has highest compliance.
-
-5. **Zero-dependency implementation possible**: Hive Mind v2 uses only Python stdlib.
-
-6. **Clean implementations are common**: 4/6 attempts (67%) had zero fix commits.
-
-7. **MCP tool count varies**: Beads v2 has the most exposed MCP tools (10).
-
-## Visualizations
-
-### Duration Comparison
 ```
-Beads v1:   ██ (~11 min)
-Beads v2:   ███ (~14 min)
-Hive v2:    ███████ (~37 min)
-Hive v1:    ████████ (~41 min)
-Swarm v1:   █████████████████████ (~109 min)
-Swarm v2:   ██████████████████████ (~114 min)
+Score = (Spec Compliance % × 50) + (Test Score × 30) + (Quality × 15) + (Efficiency × 5)
+
+Where:
+- Spec Compliance % = (implemented / total) × 100
+- Test Score = min(100, EFFECTIVE_TESTS × 1.5)  [Uses effective tests, not total]
+- Quality = 100 - (fix_commits × 10) - skip_penalty
+- Skip Penalty = max(0, (skip_ratio - 0.10) × 50)  [Penalizes >10% skipped tests]
+- Efficiency = 100 - min(100, LOC / 100)
 ```
 
-### Lines of Code
-```
-Beads v1:   ██ (1,826)
-Beads v2:   ████ (3,511)
-Hive v1:    ████ (3,545)
-Swarm v2:   █████ (4,227)
-Hive v2:    ███████ (6,165)
-Swarm v1:   █████████ (8,683)
-```
-
-### Spec Compliance
-```
-Hive v1:    ███████████████ (15/16 = 94%)
-Beads v2:   ██████████████ (14/16 = 88%)
-Swarm v1:   ██████████████ (14/16 = 88%)
-Hive v2:    █████████████ (13/16 = 81%)
-Beads v1:   ████████████ (12/16 = 75%)
-Swarm v2:   ██████████ (10/16 = 63%)
-```
-
-### Fix Commits (Lower is Better)
-```
-Beads v1:   (0)
-Beads v2:   (0)
-Hive v2:    (0)
-Swarm v2:   (0)
-Hive v1:    █ (1)
-Swarm v1:   ███████ (7)
-```
-
-### Test Count
-```
-Hive v1:    ████████████████████████████████ (64)
-Hive v2:    ███████████████████████████████ (63)
-Swarm v2:   ███████████████████ (38)
-Beads v1:   █████████ (18)
-Beads v2:   █████████ (18)
-Swarm v1:   ███████ (15)
-```
-
-## Recommendations
-
-| Scenario | Recommended Pattern |
-|----------|---------------------|
-| Quick prototype | **Beads v1** |
-| Production MCP server | **Beads v2** |
-| Production quality | **Hive Mind v1** |
-| Real data + parallel | **Hive Mind v2** |
-| Maximum features | **Hive Mind v1** |
-| Zero dependencies | **Hive Mind v2** |
-| Time-constrained | **Beads v1/v2** |
-| Full MCP tools | **Beads v2** |
-
-## Summary Table
-
-| Attempt | Speed | Code Size | Completeness | Quality | Data | Tests |
-|---------|-------|-----------|--------------|---------|------|-------|
-| Beads v1 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
-| Beads v2 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
-| Hive v2 | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Hive v1 | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Swarm v1 | ⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
-| Swarm v2 | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+**Priority Order:** Compliance > Effective Tests > Quality > Skip Ratio > Duration
 
 ---
 
-*Last updated: 2025-12-14*
-*Attempts evaluated: 6*
+## Top 10 Leaderboard
+
+| Rank | Attempt | Pattern | Score | Spec | Effective Tests | Skip% | Duration |
+|------|---------|---------|-------|------|-----------------|-------|----------|
+| 1 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **93.3** | 16/16 | 59 | 20% | ~23m |
+| 2 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m |
+| 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m |
+| 4 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m |
+| 5 | 2025-12-13-python-claude-swarm | Swarm v2 | **65.8** | 10/16 | 37 | 3% | ~1h 54m |
+| 6 | 2025-12-01-python-claude-beads | Beads v1 | **64.7** | 12/16 | 18 | 0% | ~11m |
+| 7 | 2025-12-13-python-claude-hive | Hive v2 | **56.5** | 13/16 | ~10 | **84%** | ~37m |
+| 8 | 2025-09-30-python-swarm | Swarm v1 | **55.7** | 14/16 | 15 | 0% | ~1h 49m |
+
+---
+
+## Critical: Test Quality Analysis
+
+### Test Counts vs Effective Tests
+
+| Attempt | Total Tests | Skipped | **Effective** | Skip Type | Verdict |
+|---------|-------------|---------|---------------|-----------|---------|
+| Beads v3 | 74 | 15 | **59** | Integration (Neo4j) | Acceptable |
+| Hive v1 | 64 | 0 | **64** | None | Excellent |
+| RuVector | 61 | 0 | **61** | None | Excellent |
+| Beads v2 | 18 | 0 | **18** | None | Clean |
+| Swarm v2 | 38 | ~1 | **~37** | External dep | Clean |
+| Beads v1 | 18 | 0 | **18** | None | Clean |
+| **Hive v2** | **63** | **53** | **~10** | **"Not implemented"** | **INFLATED** |
+| Swarm v1 | 15 | 0 | **15** | None | Clean |
+
+### Inflated Test Count Warning
+
+> **2025-12-13-python-claude-hive (Hive v2)** has 53 of 63 tests (84%) that skip with
+> "not yet implemented" messages. This is NOT a legitimate integration test skip pattern.
+>
+> Skip messages found:
+> - "DataLoader not yet implemented" (13 tests)
+> - "QueryEngine not yet implemented" (14 tests)
+> - "TeamNormalizer not yet implemented" (13 tests)
+> - Various "not yet implemented" (12 tests)
+>
+> **Impact:** Score drops from ~85 to **56.5** due to:
+> - Skip penalty: (0.84 - 0.10) × 50 = **37 points** off quality
+> - Effective test count: **~10** instead of 63
+
+---
+
+## Score Breakdown
+
+| Attempt | Compliance (50%) | Tests (30%) | Quality (15%) | Efficiency (5%) | **Total** |
+|---------|------------------|-------------|---------------|-----------------|-----------|
+| Beads v3 | 50.00 | 26.55 | 14.25 | 2.53 | **93.3** |
+| Hive v1 | 46.88 | 28.80 | 13.50 | 3.23 | **92.4** |
+| RuVector | 50.00 | 27.45 | 13.50 | 0.63 | **91.6** |
+| Beads v2 | 43.75 | 8.10 | 15.00 | 3.24 | **70.1** |
+| Swarm v2 | 31.25 | 16.65 | 15.00 | 2.89 | **65.8** |
+| Beads v1 | 37.50 | 8.10 | 15.00 | 4.09 | **64.7** |
+| **Hive v2** | 40.63 | 4.50 | **9.45** | 1.92 | **56.5** |
+| Swarm v1 | 43.75 | 6.75 | 4.50 | 0.66 | **55.7** |
+
+### Top 3 Detailed Scoring
+
+**1st Place: Beads v3 (93.3)**
+```
+Compliance: 16/16 (100%) × 50 = 50.00
+Tests: min(100, 59×1.5)=88.5 × 30 = 26.55
+Quality: (100 - 0 - 5) × 15 = 14.25  [5pt skip penalty for 20%]
+Efficiency: (100 - 49.5) × 5 = 2.53
+```
+
+**2nd Place: Hive v1 (92.4)**
+```
+Compliance: 15/16 (93.75%) × 50 = 46.88
+Tests: min(100, 64×1.5)=96 × 30 = 28.80
+Quality: (100 - 10 - 0) × 15 = 13.50  [10pt for 1 fix commit]
+Efficiency: (100 - 35.5) × 5 = 3.23
+```
+
+**3rd Place: RuVector (91.6)**
+```
+Compliance: 16/16 (100%) × 50 = 50.00
+Tests: min(100, 61×1.5)=91.5 × 30 = 27.45
+Quality: (100 - 10 - 0) × 15 = 13.50  [10pt for 1 fix commit]
+Efficiency: (100 - 87.5) × 5 = 0.63
+```
+
+### Why Hive v2 Ranks 7th
+
+**Despite 0 fix commits and fast completion:**
+```
+Compliance: 13/16 (81.25%) × 50 = 40.63
+Tests: min(100, 10×1.5)=15 × 30 = 4.50  [Only ~10 effective tests!]
+Quality: (100 - 0 - 37) × 15 = 9.45  [37pt penalty for 84% skip ratio]
+Efficiency: (100 - 61.65) × 5 = 1.92
+```
+
+---
+
+## Detailed Metrics Comparison
+
+| Metric | Beads v3 | Hive v1 | RuVector | Beads v2 | Swarm v2 | Beads v1 | Hive v2 | Swarm v1 |
+|--------|----------|---------|----------|----------|----------|----------|---------|----------|
+| **Pattern** | Beads | Hive | Hive+RuVector | Beads | Swarm | Beads | Hive | Swarm |
+| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 14/16 | 10/16 | 12/16 | 13/16 | 14/16 |
+| **Effective Tests** | 59 | 64 | 61 | 18 | ~37 | 18 | ~10 | 15 |
+| **Skip Ratio** | 20% | 0% | 0% | 0% | ~3% | 0% | **84%** | 0% |
+| **Lines of Code** | 4,947 | 3,545 | 8,751 | 3,511 | 4,227 | 1,826 | 6,165 | 8,683 |
+| **Fix Commits** | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 7 |
+| **Duration** | ~23m | ~41m | ~2h 18m | ~14m | ~1h 54m | ~11m | ~37m | ~1h 49m |
+| **Real Data** | Yes | Yes | Yes | Yes | Yes | Simulated | Yes | Yes |
+
+---
+
+## Pattern Performance
+
+| Pattern | Attempts | Avg Score | Best Rank | Avg Effective Tests | Notes |
+|---------|----------|-----------|-----------|---------------------|-------|
+| **Beads** | 3 | 76.0 | 1st | 32 | Most consistent pattern |
+| **Hive** | 2 | 74.5 | 2nd | 37 | High variance (v1 excellent, v2 inflated) |
+| **Swarm** | 2 | 60.7 | 5th | 26 | Lower compliance, high fix counts |
+| **RuVector** | 1 | 91.6 | 3rd | 61 | Innovative architecture |
+
+---
+
+## Analysis
+
+### Winner: Beads v3 (2025-12-14-python-claude-beads-2)
+
+The Beads v3 attempt wins by combining:
+- **Full spec compliance** (16/16) - the only Beads attempt to achieve this
+- **High effective test count** (59) - legitimate unit tests that actually run
+- **Zero fix commits** - clean first-pass implementation
+- **Acceptable skip ratio** (20%) - only integration tests for Neo4j skip
+
+### Key Differentiators
+
+| Aspect | Beads v3 | Hive v1 | RuVector |
+|--------|----------|---------|----------|
+| Compliance | 16/16 | 15/16 | 16/16 |
+| Effective Tests | 59 | 64 | 61 |
+| Skip Ratio | 20% | 0% | 0% |
+| Fix Commits | 0 | 1 | 1 |
+| LOC | 4,947 | 3,545 | 8,751 |
+| Duration | 23m | 41m | 2h 18m |
+
+Hive v1 has the most effective tests (64) with 0% skip ratio, but loses to Beads v3
+due to slightly lower compliance (15/16 vs 16/16).
+
+### Pattern Insights
+
+- **Best pattern:** Beads (highest avg score: 76.0)
+- **Most efficient:** Beads v1 (lowest LOC: 1,826)
+- **Most tests:** Hive v1 (64 effective tests)
+- **Fastest:** Beads v1 (~11 min autonomous)
+- **Worst skip ratio:** Hive v2 (84% - tests never implemented)
+
+### Common Strengths (Top 3)
+- Full or near-full spec compliance
+- Zero or one fix commits (clean implementations)
+- Real Kaggle data integration
+- Comprehensive BDD test coverage
+
+### Areas for Improvement
+- **Hive v2:** Tests were created but functionality never implemented
+- **Swarm v1:** High fix commit count (7) indicates iteration issues
+- **Swarm v2:** Low compliance (10/16) despite adequate test count
+
+---
+
+## Recommendations
+
+| Goal | Recommended Attempt |
+|------|---------------------|
+| **Highest quality** | Beads v3 (93.3 score, 100% compliance) |
+| **Most tests** | Hive v1 (64 effective BDD scenarios) |
+| **Full compliance** | Beads v3 or RuVector (16/16) |
+| **Cleanest code** | Beads v1 (1,826 LOC, 0 fixes) |
+| **Fastest prototype** | Beads v1 (~11 min) |
+| **Innovation** | RuVector (vector DB architecture) |
+
+---
+
+## Data Sources
+
+| Attempt | Report |
+|---------|--------|
+| 2025-12-14-python-claude-beads-2 | results/2025-12-14-python-claude-beads-2.md |
+| 2025-10-30-python-hive | results/2025-10-30-python-hive.md |
+| 2025-12-15-python-claude-ruvector | results/2025-12-15-python-claude-ruvector.md |
+| 2025-12-14-python-claude-beads | results/2025-12-14-python-claude-beads.md |
+| 2025-12-13-python-claude-swarm | results/2025-12-13-python-claude-swarm.md |
+| 2025-12-01-python-claude-beads | results/2025-12-01-python-claude-beads.md |
+| 2025-12-13-python-claude-hive | results/2025-12-13-python-claude-hive.md |
+| 2025-09-30-python-swarm | results/2025-09-30-python-swarm.md |
+
+---
+
+Generated by compare-attempts SOP on 2025-12-16 (v3 - Effective Tests with Skip Penalty)

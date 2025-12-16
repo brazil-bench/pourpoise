@@ -63,31 +63,52 @@ Compute a composite score for ranking attempts.
 
 **Constraints:**
 - You MUST use a weighted scoring formula
-- You MUST prioritize spec compliance (highest weight)
-- You SHOULD penalize excessive code/complexity
+- You MUST prioritize spec compliance (highest weight - 50%)
+- You MUST prioritize test coverage second (30%)
 - You SHOULD reward fewer fix commits (cleaner development)
+- Duration is a minor factor - completeness matters more than speed
 - You MUST document the scoring formula used
 
-**Suggested Scoring Formula:**
+**Scoring Formula:**
 ```
-Score = (Spec Compliance % × 40)
-      + (Test Coverage Score × 20)
-      + (Efficiency Score × 20)
-      + (Code Quality Score × 20)
+Score = (Spec Compliance % × 50)
+      + (Test Coverage Score × 30)
+      + (Code Quality Score × 15)
+      + (Efficiency Score × 5)
 
 Where:
 - Spec Compliance % = (implemented / total) × 100
-- Test Coverage Score = min(100, test_scenarios × 1.5)
-- Efficiency Score = 100 - min(100, (LOC / 100))  # Penalize bloat
-- Code Quality Score = 100 - (fix_commits × 10)   # Penalize fixes
+- Test Coverage Score = min(100, effective_tests × 1.5)  # Use EFFECTIVE tests, not total
+- Code Quality Score = 100 - (fix_commits × 10) - (skip_penalty)
+- Efficiency Score = 100 - min(100, (LOC / 100))  # Minor factor for code bloat
+
+Skip Penalty Calculation:
+- skip_ratio = skipped_tests / total_tests
+- skip_penalty = max(0, (skip_ratio - 0.10) × 50)  # Penalize if >10% skipped
+- Example: 25% skip ratio → (0.25 - 0.10) × 50 = 7.5 point penalty
 ```
+
+**IMPORTANT: Use Effective Tests, Not Total Tests**
+- Effective Tests = Passed + Failed (excluding Skipped)
+- Skipped tests do NOT count toward test coverage score
+- Attempts with >20% skip ratio should be flagged as "inflated test count"
+
+**Ranking Priority (for ties or qualitative ranking):**
+1. **Primary:** Spec Compliance (higher = better)
+2. **Secondary:** Effective Test Count (more = better, excluding skipped)
+3. **Tertiary:** Fix Commits (fewer = better)
+4. **Quaternary:** Skip Ratio (lower = better)
+5. **Quinary:** Duration (faster = better, but less important)
+
+Duration is intentionally weighted low because a complete, well-tested implementation
+is more valuable than a fast but incomplete one.
 
 ### 4. Rank and Sort Attempts
 Order attempts by composite score.
 
 **Constraints:**
 - You MUST sort by score descending (highest first)
-- You MUST handle ties by using secondary sort (fewer LOC wins)
+- You MUST handle ties by using secondary sort (more tests wins, then fewer fix commits)
 - You MUST limit to top {max_entries} entries
 - You MUST assign rank numbers (1, 2, 3, ...)
 - You SHOULD note if entries were pruned
@@ -306,8 +327,14 @@ Output the final comparison document.
 
 ### Scoring Formula
 ```
-Score = (Spec Compliance % × 40) + (Test Score × 20) + (Efficiency × 20) + (Quality × 20)
+Score = (Spec Compliance % × 50) + (Effective Test Score × 30) + (Quality × 15) + (Efficiency × 5)
+
+Where:
+- Test Score uses EFFECTIVE tests (excluding skipped)
+- Quality includes skip penalty: -max(0, (skip_ratio - 0.10) × 50)
 ```
+
+**Priority Order:** Compliance > Effective Tests > Quality > Skip Ratio > Duration
 
 ### Data Sources
 - {attempt1}: results/{attempt1}.md

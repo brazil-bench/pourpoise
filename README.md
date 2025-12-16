@@ -10,26 +10,30 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 
 ## Current Leaderboard
 
-> 6 attempts evaluated as of 2025-12-14
+> 8 attempts evaluated as of 2025-12-16
+> Methodology: Effective Tests with Skip Penalty (v3)
 
-| Rank | Attempt | Pattern | Duration | LOC | Compliance | Fix Commits |
-|------|---------|---------|----------|-----|------------|-------------|
-| 🥇 | 2025-12-01-python-claude-beads | Beads v1 | ~11 min | 1,826 | 12/16 | 0 |
-| 🥈 | 2025-12-14-python-claude-beads | Beads v2 | ~14 min | 3,511 | 14/16 | 0 |
-| 🥉 | 2025-12-13-python-claude-hive | Hive Mind v2 | ~37 min | 6,165 | 13/16 | 0 |
-| 4 | 2025-10-30-python-hive | Hive Mind v1 | ~41 min | 3,545 | 15/16 | 1 |
-| 5 | 2025-09-30-python-swarm | Swarm v1 | ~1h 49m | 8,683 | 14/16 | 7 |
-| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | ~1h 54m | 4,227 | 10/16 | 0 |
+| Rank | Attempt | Pattern | Score | Compliance | Effective Tests | Skip% | Duration |
+|------|---------|---------|-------|------------|-----------------|-------|----------|
+| 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **93.3** | 16/16 | 59 | 20% | ~23m |
+| 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m |
+| 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m |
+| 4 | 2025-12-14-python-claude-beads | Beads v2 | 70.1 | 14/16 | 18 | 0% | ~14m |
+| 5 | 2025-12-13-python-claude-swarm | Swarm v2 | 65.8 | 10/16 | 37 | 3% | ~1h 54m |
+| 6 | 2025-12-01-python-claude-beads | Beads v1 | 64.7 | 12/16 | 18 | 0% | ~11m |
+| 7 | 2025-12-13-python-claude-hive | Hive v2 | 56.5 | 13/16 | ~10 | **84%** | ~37m |
+| 8 | 2025-09-30-python-swarm | Swarm v1 | 55.7 | 14/16 | 15 | 0% | ~1h 49m |
 
 See [results/LEADERBOARD.md](results/LEADERBOARD.md) for detailed analysis.
 
 ### Key Insights
 
-- **Fastest:** Beads v1 (~11 min autonomous, 0 fix commits)
-- **Best Balance:** Beads v2 (~14 min, 88% compliance, 10 MCP tools)
-- **Most Complete:** Hive Mind v1 (94% spec compliance, 64 BDD tests)
-- **Best Real Data:** Swarm v1 (96MB Kaggle data integrated)
-- **Cleanest:** Beads v1/v2, Hive v2, Swarm v2 (0 fix commits each)
+- **Best Overall:** Beads v3 (100% compliance, 59 effective tests, 0 fix commits)
+- **Most Tests:** Hive v1 (64 effective BDD tests with 0% skip ratio)
+- **Full Compliance:** Beads v3 and RuVector both achieve 16/16
+- **Fastest:** Beads v1 (~11 min autonomous)
+- **Innovation:** RuVector uses vector DB instead of Neo4j
+- **Warning:** Hive v2 has 84% skip ratio (53 tests never run) - tests were stubs
 
 ## Setup
 
@@ -185,17 +189,22 @@ This will:
 5. Create detailed comparison tables with data strategy assessment
 6. Output analysis and insights to `results/LEADERBOARD.md`
 
-## Scoring Methodology
+## Scoring Methodology (v3)
 
 ```
-Score = (Spec % × 40) + (Tests × 20) + (Efficiency × 20) + (Quality × 20)
+Score = (Spec % × 50) + (Tests × 30) + (Quality × 15) + (Efficiency × 5)
 
 Where:
-- Spec Compliance % = (schema implemented / total) × 100
-- Test Coverage Score = min(100, test_scenarios × 1.5)
-- Efficiency Score = 100 - min(100, LOC / 100)
-- Code Quality Score = 100 - (fix_commits × 10)
+- Spec Compliance % = (implemented / total) × 100
+- Test Score = min(100, EFFECTIVE_TESTS × 1.5)  [excludes skipped tests]
+- Quality = 100 - (fix_commits × 10) - skip_penalty
+- Skip Penalty = max(0, (skip_ratio - 0.10) × 50)  [penalizes >10% skipped]
+- Efficiency = 100 - min(100, LOC / 100)
 ```
+
+**Priority Order:** Compliance > Effective Tests > Quality > Skip Ratio > Duration
+
+The methodology uses "effective tests" (passed + failed, excluding skipped) rather than total tests to prevent inflated test counts from `pytest.skip("not yet implemented")` stubs.
 
 ## Directory Structure
 
