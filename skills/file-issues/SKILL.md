@@ -2,7 +2,7 @@
 name: file-issues
 description: Parse evaluation reports and create GitHub issues on attempt repositories for each shortcoming, warning, or improvement opportunity identified during review.
 type: anthropic-skill
-version: "1.2"
+version: "1.3"
 ---
 
 # File Issues from Evaluation
@@ -176,7 +176,64 @@ Body:
 Filed from evaluation: results/{attempt_repo}.md
 ```
 
-#### 3d. Architecture/Quality Issues
+#### 3d. Skipped Tests
+Look for skip ratios above 10% in the "Metrics" or "Test Skip Analysis" sections:
+
+**Patterns to detect:**
+- Skip Ratio > 10% (benchmark penalty threshold)
+- Tests (Skipped) > 0
+- Conditional skips for external dependencies
+
+**Extraction:**
+```bash
+# Extract skip ratio and skipped test count
+grep -E "Skip Ratio|Tests \(Skipped\)" ./results/{attempt_repo}.md
+```
+
+**Issue Template:**
+```
+Title: [Test Quality] {X}% tests skip conditionally ({Y}/{Z} tests)
+Label: enhancement
+Body:
+## Issue
+{Y} of {Z} tests ({X}%) are skipped.
+
+## Details
+{description of why tests skip - e.g., Neo4j not available}
+
+## Impact
+- Skip Ratio: {X}%
+- Effective Tests: {effective} (vs {total} total)
+- Benchmark penalty: Exceeds 10% threshold
+
+## Assessment
+{evaluation of whether skips are acceptable or problematic}
+
+### Acceptable Skips
+- Integration tests that require external services (Neo4j, Redis, etc.)
+- Conditional skips with proper `pytest.skip()` messages
+
+### Problematic Skips
+- Tests with "not yet implemented" messages
+- Unconditional skips that inflate test counts
+- Stub tests that never execute
+
+## Recommendation
+{suggested action or note that no action required}
+
+---
+Filed from evaluation: results/{attempt_repo}.md
+```
+
+**Skip Ratio Thresholds:**
+| Skip Ratio | Assessment | Action |
+|------------|------------|--------|
+| 0-10% | Acceptable | No issue needed |
+| 10-30% | Notable | File issue, note if legitimate |
+| 30-50% | Concerning | File issue, recommend fixes |
+| 50%+ | Critical | File issue as `bug`, high priority |
+
+#### 3e. Architecture/Quality Issues
 Look for concerns in "Architecture Summary", "Weaknesses", or "Areas of Note":
 
 **Patterns:**
@@ -269,10 +326,13 @@ When creating the summary [Compliance] issue, reference related detail issues:
 |------------------|--------------|---------------|
 | Missing requirement | `[Missing]` | `enhancement` |
 | Test quality issue | `[Test Quality]` | `bug` |
+| Skipped tests (>10%) | `[Test Quality]` | `enhancement` or `bug`* |
 | Spec compliance | `[Compliance]` | `enhancement` |
 | Architecture/quality | `[Quality]` | `enhancement` |
 | Performance concern | `[Performance]` | `enhancement` |
 | Documentation gap | `[Docs]` | `documentation` |
+
+*Use `bug` for skip ratios >50% or problematic skips; use `enhancement` for acceptable integration test skips.
 
 #### 4a. Summary Issue Template
 
