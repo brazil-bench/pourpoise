@@ -391,6 +391,49 @@ Determine whether the implementation uses real external data or simulated/mock d
   - Note that field would be null with Kaggle data (data limitation)
   - This is NOT a failure - it's a data source constraint
 
+#### 6b. Documentation Quality Assessment
+
+Evaluate the README.md for essential user documentation.
+
+**Required Elements:**
+1. **Setup Instructions**: Prerequisites, installation steps, environment configuration
+2. **MCP Server Setup**: How to start the server, how to connect Claude
+3. **Example Q&A**: Sample questions and expected responses/output
+
+**Extraction Commands:**
+```bash
+# Check README content
+head -100 ./reviews/{attempt_repo}/README.md
+
+# Look for key documentation sections
+grep -E "Quick Start|Installation|Setup|MCP|Example|Usage" ./reviews/{attempt_repo}/README.md
+```
+
+**Documentation Quality Levels:**
+| Level | Criteria | In Report |
+|-------|----------|-----------|
+| Excellent | All 3 elements + extras (architecture, API ref, troubleshooting) | "Comprehensive README" |
+| Good | All 3 required elements present | "Good documentation" |
+| Acceptable | 2 of 3 elements | "Partial documentation" |
+| Poor | 0-1 elements | "Missing documentation" |
+
+**Best Practice Reference:**
+- `2025-10-30-python-hive`: Excellent (Quick Start, MCP config, 15+ demo questions, architecture, troubleshooting)
+- `2025-12-15-python-claude-ruvector`: Excellent (detailed setup, claude mcp add example, Q&A with output)
+
+**Include in Report:**
+```markdown
+## Documentation Quality
+
+| Element | Present | Notes |
+|---------|---------|-------|
+| Setup Instructions | Yes/No | {details} |
+| MCP Server Setup | Yes/No | {details} |
+| Example Q&A | Yes/No | {details} |
+
+**Assessment:** {Excellent/Good/Acceptable/Poor}
+```
+
 ### 7. Generate Codebase Documentation
 Generate comprehensive documentation for the implementation using the codebase-summary SOP.
 

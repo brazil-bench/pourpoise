@@ -2,7 +2,7 @@
 name: file-issues
 description: Parse evaluation reports and create GitHub issues on attempt repositories for each shortcoming, warning, or improvement opportunity identified during review.
 type: anthropic-skill
-version: "1.4"
+version: "1.5"
 ---
 
 # File Issues from Evaluation
@@ -296,7 +296,63 @@ Filed from evaluation: results/{attempt_repo}.md
 | Custom BDD helper | Non-standard | File enhancement issue |
 | E2E only / No BDD | Poor | File enhancement issue |
 
-#### 3f. Architecture/Quality Issues
+#### 3f. Documentation Quality
+Check if README.md contains essential user documentation:
+
+**Required Elements:**
+1. **Setup Instructions**: Prerequisites, installation, configuration
+2. **MCP Server Setup**: How to start server, how to connect Claude
+3. **Example Q&A**: Sample questions and expected responses
+
+**Extraction:**
+```bash
+# Check README in cloned repo
+head -100 ./reviews/{attempt_repo}/README.md
+
+# Look for key sections
+grep -E "Quick Start|Installation|Setup|MCP|Example|Usage" ./reviews/{attempt_repo}/README.md
+```
+
+**Issue Template:**
+```
+Title: [Docs] README missing setup instructions and usage examples
+Label: documentation
+Body:
+## Issue
+The README.md lacks essential user documentation.
+
+## Missing Documentation
+
+### 1. Setup Instructions
+- Prerequisites (Python version, Neo4j)
+- Installation steps
+- Environment configuration
+
+### 2. MCP Server Setup
+- How to start the MCP server
+- How to configure Claude to use the server
+- Example configuration
+
+### 3. Usage Examples with Q&A
+- Example questions users can ask
+- Expected responses/output
+
+## Best Practice Example
+See `2025-10-30-python-hive` for comprehensive documentation.
+
+---
+Filed from evaluation: results/{attempt_repo}.md
+```
+
+**Documentation Quality Levels:**
+| Level | Criteria | Action |
+|-------|----------|--------|
+| Excellent | All 3 elements + extras (architecture, API ref) | No issue needed |
+| Good | All 3 elements present | No issue needed |
+| Acceptable | 2 of 3 elements | Optional improvement issue |
+| Poor | 0-1 elements | File documentation issue |
+
+#### 3g. Architecture/Quality Issues
 Look for concerns in "Architecture Summary", "Weaknesses", or "Areas of Note":
 
 **Patterns:**
@@ -391,10 +447,10 @@ When creating the summary [Compliance] issue, reference related detail issues:
 | Test quality issue | `[Test Quality]` | `bug` |
 | Skipped tests (>10%) | `[Test Quality]` | `enhancement` or `bug`* |
 | Test best practices | `[Test Quality]` | `enhancement` |
+| Documentation quality | `[Docs]` | `documentation` |
 | Spec compliance | `[Compliance]` | `enhancement` |
 | Architecture/quality | `[Quality]` | `enhancement` |
 | Performance concern | `[Performance]` | `enhancement` |
-| Documentation gap | `[Docs]` | `documentation` |
 
 *Use `bug` for skip ratios >50% or problematic skips; use `enhancement` for acceptable integration test skips.
 
