@@ -73,6 +73,7 @@ This repository includes skills in the `skills/` directory that provide Standard
 |-------|-------------|---------|
 | `evaluate-attempt` | Evaluate a completed attempt | "evaluate attempt 2025-10-30-python-hive" |
 | `compare-attempts` | Generate leaderboard comparing all attempts | "compare attempts" |
+| `file-issues` | File GitHub issues for shortcomings found in evaluation | "file issues for 2025-12-13-python-claude-hive" |
 | `codebase-summary` | Generate documentation for a codebase | "summarize codebase reviews/attempt-name" |
 | `pdd` | Prompt-Driven Development planning | "help me design a new feature" |
 | `code-task-generator` | Generate code task files | "generate tasks from my PDD plan" |
