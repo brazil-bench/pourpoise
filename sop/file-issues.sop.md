@@ -233,7 +233,61 @@ Filed from evaluation: results/{attempt_repo}.md
 | 30-50% | Concerning | File issue, recommend fixes |
 | 50%+ | Critical | File issue as `bug`, high priority |
 
-#### 3e. Architecture/Quality Issues
+#### 3e. Test Best Practices
+Check if tests follow pytest-bdd best practices with Gherkin `.feature` files:
+
+**Patterns to detect:**
+- Missing `.feature` files
+- Docstring-only BDD (not executable Gherkin)
+- Custom BDD helper classes instead of pytest-bdd
+- E2E-only tests without unit test coverage
+
+**Extraction:**
+```bash
+# Check for pytest-bdd usage
+grep -E "pytest-bdd|\.feature|Given.*When.*Then" ./results/{attempt_repo}.md
+
+# Check test approach in comparison analysis
+grep -A 5 "Test.*Framework\|BDD Style" ./results/{attempt_repo}.md
+```
+
+**Issue Template:**
+```
+Title: [Test Quality] Use pytest-bdd with .feature files instead of {current_approach}
+Label: enhancement
+Body:
+## Issue
+{description of current test approach}
+
+## Current Approach
+{code example showing current pattern}
+
+## Best Practice
+Use pytest-bdd with proper Gherkin `.feature` files.
+
+## Benefits of pytest-bdd
+1. Readable scenarios for non-technical stakeholders
+2. Reusable step definitions
+3. Standard tooling (IDE support, linting)
+4. Separation of concerns
+
+## Recommendation
+{specific migration guidance}
+
+---
+Filed from evaluation: results/{attempt_repo}.md
+```
+
+**Test Pattern Quality:**
+| Pattern | Quality | Action |
+|---------|---------|--------|
+| pytest-bdd + .feature files | Best | No issue needed |
+| pytest-bdd without .feature | Good | Optional improvement |
+| Docstring BDD | Acceptable | File enhancement issue |
+| Custom BDD helper | Non-standard | File enhancement issue |
+| E2E only / No BDD | Poor | File enhancement issue |
+
+#### 3f. Architecture/Quality Issues
 Look for concerns in "Architecture Summary", "Weaknesses", or "Areas of Note":
 
 **Patterns:**
@@ -335,6 +389,7 @@ When creating the summary [Compliance] issue, reference related detail issues:
 | Missing requirement | `[Missing]` | `enhancement` |
 | Test quality issue | `[Test Quality]` | `bug` |
 | Skipped tests (>10%) | `[Test Quality]` | `enhancement` or `bug`* |
+| Test best practices | `[Test Quality]` | `enhancement` |
 | Spec compliance | `[Compliance]` | `enhancement` |
 | Architecture/quality | `[Quality]` | `enhancement` |
 | Performance concern | `[Performance]` | `enhancement` |
