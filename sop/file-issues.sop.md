@@ -36,6 +36,7 @@ Confirm the attempt repository exists and is writable.
 - You MUST verify the repo exists on GitHub
 - You MUST check that issues are enabled on the repo
 - You SHOULD check for existing issues to avoid duplicates
+- You SHOULD create required labels if they don't exist
 
 ```bash
 # Verify repo exists
@@ -43,10 +44,41 @@ gh repo view brazil-bench/{attempt_repo}
 
 # List existing issues to check for duplicates
 gh issue list -R brazil-bench/{attempt_repo} --limit 100
+
+# Check if labels exist, create if needed (optional but recommended)
+gh label list -R brazil-bench/{attempt_repo}
+
+# Create labels if they don't exist (gh label create is idempotent)
+gh label create -R brazil-bench/{attempt_repo} "evaluation" --description "Filed from automated evaluation" --color "0366d6" 2>/dev/null || true
+gh label create -R brazil-bench/{attempt_repo} "test-quality" --description "Test coverage or quality issue" --color "d93f0b" 2>/dev/null || true
+gh label create -R brazil-bench/{attempt_repo} "missing-requirement" --description "Missing spec requirement" --color "fbca04" 2>/dev/null || true
+gh label create -R brazil-bench/{attempt_repo} "compliance" --description "Spec compliance issue" --color "c5def5" 2>/dev/null || true
+gh label create -R brazil-bench/{attempt_repo} "quality" --description "Code quality concern" --color "d4c5f9" 2>/dev/null || true
 ```
 
 ### 3. Extract Shortcomings from Report
 Parse the evaluation report to identify all issues to file.
+
+**Systematic Extraction Commands:**
+
+Use these commands to programmatically extract shortcomings:
+
+```bash
+# Extract missing requirements (unchecked items)
+grep -E "^- \[ \]" ./results/{attempt_repo}.md
+
+# Extract test quality warnings
+grep -A 20 "## Test Quality Warning\|## Test Skip Analysis" ./results/{attempt_repo}.md
+
+# Extract weaknesses section
+grep -A 10 "## Weaknesses" ./results/{attempt_repo}.md
+
+# Extract compliance score
+grep -E "Spec Compliance.*[0-9]+/[0-9]+" ./results/{attempt_repo}.md
+
+# Extract skip ratio
+grep -E "Skip Ratio.*[0-9]+%" ./results/{attempt_repo}.md
+```
 
 **Categories of Issues to Extract:**
 
@@ -54,6 +86,11 @@ Parse the evaluation report to identify all issues to file.
 Look in the "Requirements Checklist" section for unchecked items:
 
 **Pattern:** Lines starting with `- [ ]` indicate missing/partial requirements
+
+```bash
+# Extract all missing requirements
+grep -E "^- \[ \]" ./results/{attempt_repo}.md
+```
 
 ```markdown
 ### Missing/Partial
@@ -166,21 +203,67 @@ File each extracted shortcoming as a separate GitHub issue.
 
 **Constraints:**
 - You MUST create one issue per shortcoming (not a combined issue)
-- You MUST apply appropriate labels
+- You MUST apply appropriate labels (after ensuring they exist in Step 2)
 - You MUST include reference to the evaluation report
 - You MUST check for duplicates before creating (match on title)
+- You MUST create detail issues BEFORE the summary issue (so you can reference issue numbers)
 - You SHOULD group related issues with a common prefix
 - You MAY skip issues if identical ones already exist
+
+**Issue Creation Order:**
+1. Create all detail issues first ([Missing], [Test Quality], [Quality], etc.)
+2. Note the issue numbers assigned
+3. Create the [Compliance] summary issue last, referencing the detail issues
 
 ```bash
 # Check if issue already exists
 gh issue list -R brazil-bench/{attempt_repo} --search "{issue_title}" --json title
 
-# Create issue if not a duplicate
+# Create issue using HEREDOC for multi-line markdown body
+gh issue create -R brazil-bench/{attempt_repo} \
+  --title "[Missing] MCP server implementation" \
+  --label "evaluation,missing-requirement" \
+  --body "$(cat <<'EOF'
+## Requirement
+
+The spec requires an MCP server with tools exposed as endpoints.
+
+## Current State
+
+Query engine exists but not exposed as MCP tools.
+
+## Suggested Fix
+
+Add MCP server wrapper using `fastmcp` or `mcp` package.
+
+---
+Filed from evaluation: [results/{attempt_repo}.md](https://github.com/brazil-bench/pourpoise/blob/main/results/{attempt_repo}.md)
+EOF
+)"
+
+# If labels don't exist, create without labels (they can be added later)
 gh issue create -R brazil-bench/{attempt_repo} \
   --title "{issue_title}" \
-  --body "{issue_body}" \
-  --label "{labels}"
+  --body "$(cat <<'EOF'
+{issue_body_markdown}
+EOF
+)"
+```
+
+**Cross-Referencing Issues:**
+
+When creating the summary [Compliance] issue, reference related detail issues:
+
+```markdown
+## Missing Requirements
+
+1. **MCP server implementation** - see #2
+2. **Query performance benchmarks** - see #3
+3. **Cross-file queries verification** - see #4
+
+## Additional Issues
+
+- **Test Quality:** 84% skip ratio - see #1
 ```
 
 **Issue Creation Rules:**
@@ -193,6 +276,50 @@ gh issue create -R brazil-bench/{attempt_repo} \
 | Architecture/quality | `[Quality]` | `quality` |
 | Performance concern | `[Performance]` | `performance` |
 | Documentation gap | `[Docs]` | `documentation` |
+
+#### 4a. Summary Issue Template
+
+After creating all detail issues, create a [Compliance] summary issue that links them together:
+
+```bash
+gh issue create -R brazil-bench/{attempt_repo} \
+  --title "[Compliance] Spec compliance at {X}% ({Y}/16 requirements)" \
+  --label "evaluation,compliance" \
+  --body "$(cat <<'EOF'
+## Current Status
+
+{Y}/16 requirements met ({X}% compliance)
+
+## Missing Requirements
+
+1. **{requirement_1}** - see #{issue_number_1}
+2. **{requirement_2}** - see #{issue_number_2}
+...
+
+## Implemented Requirements
+
+### Category 1 (N/M)
+- [x] Requirement that passed
+- [x] Another passing requirement
+...
+
+## Additional Issues
+
+- **Test Quality:** {skip_ratio}% skip ratio - see #{test_quality_issue}
+
+## Benchmark Score
+
+Current score: **{score}** (rank {rank} of 8)
+
+To improve ranking, address the issues linked above.
+
+---
+Filed from evaluation: [results/{attempt_repo}.md](https://github.com/brazil-bench/pourpoise/blob/main/results/{attempt_repo}.md)
+EOF
+)"
+```
+
+This summary issue serves as an index to all other filed issues and provides context for prioritization.
 
 ### 5. Generate Summary
 Output a summary of all issues created.
@@ -307,8 +434,18 @@ file issues for 2025-12-14-python-claude-beads-2 --labels "evaluation,v3-methodo
 - Use `gh issue list -R repo --search "keyword"` to check
 
 **Labels don't exist**
-- Labels are created automatically by `gh issue create`
-- If you want specific colors, create labels manually first
+- `gh issue create --label` will FAIL if the label doesn't exist
+- Create labels first using Step 2's label creation commands
+- Or create issues without labels: omit the `--label` flag
+- Labels can be added later via `gh issue edit {number} --add-label "label-name"`
+
+```bash
+# Create missing label
+gh label create -R brazil-bench/{attempt_repo} "evaluation" --color "0366d6"
+
+# Add label to existing issue
+gh issue edit 1 -R brazil-bench/{attempt_repo} --add-label "evaluation"
+```
 
 **Too many issues**
 - Use `--dry-run` first to preview
