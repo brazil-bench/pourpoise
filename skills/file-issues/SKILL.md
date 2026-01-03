@@ -2,7 +2,7 @@
 name: file-issues
 description: Parse evaluation reports and create GitHub issues on attempt repositories for each shortcoming, warning, or improvement opportunity identified during review.
 type: anthropic-skill
-version: "1.1"
+version: "1.2"
 ---
 
 # File Issues from Evaluation
@@ -16,7 +16,6 @@ improvement opportunity identified during the review.
 - **attempt_repo** (required): Repository name (e.g., `2025-12-13-python-claude-hive`)
 - **evaluation_path** (optional, default: `./results/{attempt_repo}.md`): Path to evaluation report
 - **dry_run** (optional, default: `false`): If true, show issues that would be created without creating them
-- **labels** (optional, default: `evaluation,automated`): Comma-separated labels to apply
 
 ## Steps
 
@@ -43,7 +42,7 @@ Confirm the attempt repository exists and is writable.
 - You MUST verify the repo exists on GitHub
 - You MUST check that issues are enabled on the repo
 - You SHOULD check for existing issues to avoid duplicates
-- You SHOULD create required labels if they don't exist
+- You SHOULD use default GitHub labels (no custom labels required)
 
 ```bash
 # Verify repo exists
@@ -52,16 +51,21 @@ gh repo view brazil-bench/{attempt_repo}
 # List existing issues to check for duplicates
 gh issue list -R brazil-bench/{attempt_repo} --limit 100
 
-# Check if labels exist, create if needed (optional but recommended)
+# List available labels (use default GitHub labels)
 gh label list -R brazil-bench/{attempt_repo}
-
-# Create labels if they don't exist (gh label create is idempotent)
-gh label create -R brazil-bench/{attempt_repo} "evaluation" --description "Filed from automated evaluation" --color "0366d6" 2>/dev/null || true
-gh label create -R brazil-bench/{attempt_repo} "test-quality" --description "Test coverage or quality issue" --color "d93f0b" 2>/dev/null || true
-gh label create -R brazil-bench/{attempt_repo} "missing-requirement" --description "Missing spec requirement" --color "fbca04" 2>/dev/null || true
-gh label create -R brazil-bench/{attempt_repo} "compliance" --description "Spec compliance issue" --color "c5def5" 2>/dev/null || true
-gh label create -R brazil-bench/{attempt_repo} "quality" --description "Code quality concern" --color "d4c5f9" 2>/dev/null || true
 ```
+
+**Default GitHub Labels to Use:**
+
+| Issue Type | Default Label | Reason |
+|------------|---------------|--------|
+| Missing requirement | `enhancement` | It's a feature that needs to be added |
+| Test quality issue | `bug` | Tests not working as expected |
+| Compliance summary | `enhancement` | Tracking improvements needed |
+| Quality concern | `enhancement` | Code improvement request |
+| Documentation gap | `documentation` | Missing or incomplete docs |
+
+Using default labels avoids permission issues (creating custom labels requires admin access).
 
 ### 3. Extract Shortcomings from Report
 Parse the evaluation report to identify all issues to file.
@@ -99,16 +103,10 @@ Look in the "Requirements Checklist" section for unchecked items:
 grep -E "^- \[ \]" ./results/{attempt_repo}.md
 ```
 
-```markdown
-### Missing/Partial
-- [ ] MCP server implementation (tools not exposed as MCP endpoints)
-- [ ] Query performance benchmarks (< 2s simple, < 5s aggregate)
-```
-
 **Issue Template:**
 ```
 Title: [Missing] {requirement description}
-Labels: evaluation, missing-requirement
+Label: enhancement
 Body:
 ## Requirement
 {description}
@@ -134,7 +132,7 @@ Look for the "Test Quality Warning" or "Test Skip Analysis" sections:
 **Issue Template:**
 ```
 Title: [Test Quality] {description of test issue}
-Labels: evaluation, test-quality
+Label: bug
 Body:
 ## Issue
 {description of the test quality problem}
@@ -163,7 +161,7 @@ Look for compliance scores below 100%:
 **Issue Template:**
 ```
 Title: [Compliance] Spec compliance at {X}% ({Y}/16 requirements)
-Labels: evaluation, compliance
+Label: enhancement
 Body:
 ## Current Status
 {X}/16 requirements met ({percentage}%)
@@ -190,7 +188,7 @@ Look for concerns in "Architecture Summary", "Weaknesses", or "Areas of Note":
 **Issue Template:**
 ```
 Title: [Quality] {description}
-Labels: evaluation, quality
+Label: enhancement
 Body:
 ## Issue
 {description}
@@ -210,7 +208,7 @@ File each extracted shortcoming as a separate GitHub issue.
 
 **Constraints:**
 - You MUST create one issue per shortcoming (not a combined issue)
-- You MUST apply appropriate labels (after ensuring they exist in Step 2)
+- You MUST apply appropriate default labels
 - You MUST include reference to the evaluation report
 - You MUST check for duplicates before creating (match on title)
 - You MUST create detail issues BEFORE the summary issue (so you can reference issue numbers)
@@ -229,7 +227,7 @@ gh issue list -R brazil-bench/{attempt_repo} --search "{issue_title}" --json tit
 # Create issue using HEREDOC for multi-line markdown body
 gh issue create -R brazil-bench/{attempt_repo} \
   --title "[Missing] MCP server implementation" \
-  --label "evaluation,missing-requirement" \
+  --label "enhancement" \
   --body "$(cat <<'EOF'
 ## Requirement
 
@@ -245,14 +243,6 @@ Add MCP server wrapper using `fastmcp` or `mcp` package.
 
 ---
 Filed from evaluation: [results/{attempt_repo}.md](https://github.com/brazil-bench/pourpoise/blob/main/results/{attempt_repo}.md)
-EOF
-)"
-
-# If labels don't exist, create without labels (they can be added later)
-gh issue create -R brazil-bench/{attempt_repo} \
-  --title "{issue_title}" \
-  --body "$(cat <<'EOF'
-{issue_body_markdown}
 EOF
 )"
 ```
@@ -275,13 +265,13 @@ When creating the summary [Compliance] issue, reference related detail issues:
 
 **Issue Creation Rules:**
 
-| Shortcoming Type | Title Prefix | Primary Label |
+| Shortcoming Type | Title Prefix | Default Label |
 |------------------|--------------|---------------|
-| Missing requirement | `[Missing]` | `missing-requirement` |
-| Test quality issue | `[Test Quality]` | `test-quality` |
-| Spec compliance | `[Compliance]` | `compliance` |
-| Architecture/quality | `[Quality]` | `quality` |
-| Performance concern | `[Performance]` | `performance` |
+| Missing requirement | `[Missing]` | `enhancement` |
+| Test quality issue | `[Test Quality]` | `bug` |
+| Spec compliance | `[Compliance]` | `enhancement` |
+| Architecture/quality | `[Quality]` | `enhancement` |
+| Performance concern | `[Performance]` | `enhancement` |
 | Documentation gap | `[Docs]` | `documentation` |
 
 #### 4a. Summary Issue Template
@@ -291,7 +281,7 @@ After creating all detail issues, create a [Compliance] summary issue that links
 ```bash
 gh issue create -R brazil-bench/{attempt_repo} \
   --title "[Compliance] Spec compliance at {X}% ({Y}/16 requirements)" \
-  --label "evaluation,compliance" \
+  --label "enhancement" \
   --body "$(cat <<'EOF'
 ## Current Status
 
@@ -356,45 +346,6 @@ Output a summary of all issues created.
 - Issues skipped (duplicates): {Z}
 ```
 
-## Output Format
-
-The SOP produces:
-1. GitHub issues on the attempt repository
-2. A summary markdown output showing all issues filed
-
-```markdown
-# Issue Filing Summary: {attempt_repo}
-
-## Repository
-brazil-bench/{attempt_repo}
-
-## Evaluation Report
-results/{attempt_repo}.md
-
-## Issues Created
-
-### Missing Requirements ({count})
-| Issue | Title | URL |
-|-------|-------|-----|
-| #1 | [Missing] MCP server implementation | https://... |
-
-### Test Quality ({count})
-| Issue | Title | URL |
-|-------|-------|-----|
-| #2 | [Test Quality] 84% skip ratio | https://... |
-
-### Compliance ({count})
-...
-
-### Quality ({count})
-...
-
-## Statistics
-- Total issues created: {N}
-- Skipped (duplicates): {M}
-- Evaluation score: {score}
-```
-
 ## Examples
 
 ### Example 1: Filing issues for Hive v2
@@ -418,13 +369,6 @@ Expected issues:
 file issues for 2025-12-13-python-claude-hive --dry-run
 ```
 
-### Example 3: Filing with custom labels
-
-```bash
-# Add custom labels
-file issues for 2025-12-14-python-claude-beads-2 --labels "evaluation,v3-methodology,needs-review"
-```
-
 ## Troubleshooting
 
 **No evaluation report found**
@@ -441,18 +385,10 @@ file issues for 2025-12-14-python-claude-beads-2 --labels "evaluation,v3-methodo
 - Use `gh issue list -R repo --search "keyword"` to check
 
 **Labels don't exist**
-- `gh issue create --label` will FAIL if the label doesn't exist
-- Create labels first using Step 2's label creation commands
-- Or create issues without labels: omit the `--label` flag
-- Labels can be added later via `gh issue edit {number} --add-label "label-name"`
-
-```bash
-# Create missing label
-gh label create -R brazil-bench/{attempt_repo} "evaluation" --color "0366d6"
-
-# Add label to existing issue
-gh issue edit 1 -R brazil-bench/{attempt_repo} --add-label "evaluation"
-```
+- Use default GitHub labels (`enhancement`, `bug`, `documentation`) which exist on all repos
+- Avoid custom labels as creating them requires admin access (HTTP 403 error)
+- If a label doesn't exist, omit the `--label` flag entirely
+- The title prefix (e.g., `[Missing]`, `[Test Quality]`) provides categorization without labels
 
 **Too many issues**
 - Use `--dry-run` first to preview
