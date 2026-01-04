@@ -1,3 +1,10 @@
+---
+name: re-evaluate
+description: Re-evaluate attempt repositories after issues are closed, update evaluation reports, and file new issues for any regressions or newly discovered problems.
+type: anthropic-skill
+version: "1.1"
+---
+
 # Re-Evaluate Attempt After Changes
 
 ## Overview
@@ -61,10 +68,14 @@ gh issue view {issue_number} -R brazil-bench/{attempt_repo} --json comments
 | Issue Type | Re-evaluation Focus |
 |------------|---------------------|
 | `[Missing]` | Re-check spec compliance for that requirement |
-| `[Test Quality]` | Re-run tests, recalculate skip ratio |
+| `[Test Quality]` | Re-run tests, recalculate skip ratio, **check integration tests are self-contained** |
 | `[Docs]` | Re-check README for required elements |
 | `[Quality]` | Re-review architecture/code quality |
 | `[Compliance]` | Full spec compliance re-check |
+
+**ALWAYS Check (regardless of issue type):**
+- Integration tests must run without skipping due to missing dependencies
+- Tests should use testcontainers or pytest-docker to manage data stores
 
 ### 3. Targeted Re-Evaluation
 Based on closed issues, re-evaluate only the affected areas.
@@ -149,6 +160,69 @@ cat ./tasks/beads/spec.md | grep -E "^##|^-"
 
 # Check implementation against each requirement
 # (Follow evaluate-attempt SOP Step 6)
+```
+
+#### 3e. Re-Evaluate Integration Test Quality (REQUIRED)
+**ALWAYS check this** - integration tests must be self-contained and actually run.
+
+```bash
+cd ./reviews/{attempt_repo}
+
+# Check if integration tests still skip due to missing dependencies
+pytest --tb=no -v 2>&1 | grep -E "SKIPPED.*neo4j|SKIPPED.*database|SKIPPED.*not running"
+
+# Check for testcontainers usage (good pattern)
+grep -r "testcontainers\|Neo4jContainer\|DockerContainer" tests/ --include="*.py"
+
+# Check for pytest-docker usage (good pattern)
+grep -r "pytest-docker\|docker_compose_file" tests/ pyproject.toml
+
+# Check for skip patterns that indicate external dependency issues
+grep -r "pytest.skip.*neo4j\|pytest.skip.*database\|skipif.*connection" tests/ --include="*.py"
+
+# Run tests and count integration test results
+pytest -v tests/ 2>&1 | grep -E "integration|Integration" | head -20
+```
+
+**Self-Contained Test Verification:**
+
+| Check | Command | Expected |
+|-------|---------|----------|
+| Uses testcontainers | `grep -r "testcontainers" tests/` | Has matches |
+| No external skips | `grep "pytest.skip.*not running"` | No matches |
+| Integration tests run | `pytest -v` output | 0 skipped for Neo4j |
+| Docker fixture exists | `grep "Neo4jContainer" conftest.py` | Has matches |
+
+**If Integration Tests Still Skip:**
+
+File a new issue using the template from file-issues SOP section 3d-integration:
+- Title: `[Test Quality] Integration tests must be self-contained - use testcontainers`
+- Label: `bug`
+- Include testcontainers code examples in issue body
+
+**Scoring Impact:**
+
+| Integration Test State | Score Modifier |
+|----------------------|----------------|
+| Self-contained (testcontainers/docker) | No penalty |
+| Skips due to missing dependency | -10 points quality |
+| No integration tests | -15 points quality |
+
+**Document in Report:**
+
+```markdown
+## Integration Test Quality
+
+| Aspect | Status |
+|--------|--------|
+| Self-contained | Yes/No |
+| Pattern used | testcontainers / pytest-docker / mock / external |
+| Integration tests that run | X passed |
+| Integration tests that skip | Y skipped |
+
+{If skips exist}
+⚠️ **Issue:** Integration tests skip when dependencies not running.
+New issue filed: #{issue_number}
 ```
 
 ### 4. Update Evaluation Report
