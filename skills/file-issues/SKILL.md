@@ -2,7 +2,7 @@
 name: file-issues
 description: Parse evaluation reports and create GitHub issues on attempt repositories for each shortcoming, warning, or improvement opportunity identified during review. Supports Python and Swift/iOS projects.
 type: anthropic-skill
-version: "1.9"
+version: "2.0"
 ---
 
 # File Issues from Evaluation
@@ -798,6 +798,92 @@ Body:
 ---
 Filed from evaluation: results/{attempt_repo}.md
 ```
+
+#### 3h. Context Header Blocks
+Check if source code files have proper context header comment blocks.
+
+**Patterns to detect:**
+- Files missing header blocks entirely
+- Headers missing required sections (Purpose, Interfaces, Change History)
+- Headers not updated with change history
+
+**Extraction:**
+```bash
+# Check for context headers in source files
+for f in $(find ./reviews/{attempt_repo}/src -name "*.py" -not -name "__init__.py"); do
+  if ! head -30 "$f" | grep -q "CONTEXT\|Purpose\|Module:"; then
+    echo "Missing header: $f"
+  fi
+done
+```
+
+**Issue Template:**
+```
+Title: [Quality] Source files missing context header blocks
+Label: enhancement
+Body:
+## Issue
+
+Source code files are missing required context header comment blocks.
+
+## Required Header Format
+
+Every source file must have a header block that includes:
+1. **Purpose** - What the file/module does
+2. **Interfaces** - Key classes, functions, or APIs exposed
+3. **Change History** - Record of modifications (updated on every change)
+
+## Example Header (Python)
+
+```python
+"""
+================================================================================
+CONTEXT BLOCK
+================================================================================
+File: server.py
+Module: brazilian_soccer_mcp.server
+Purpose: MCP server implementation for Brazilian soccer knowledge graph
+
+Description:
+    Exposes Neo4j queries as MCP tools for Claude to use.
+
+Interfaces:
+    - create_server(): Creates and configures the MCP server
+    - MCPServer: Main server class with tool handlers
+
+Dependencies:
+    - mcp: MCP protocol implementation
+    - neo4j: Database connection
+
+Change History:
+    - 2025-01-04: Add get_player_stats tool
+    - 2025-01-03: Initial creation
+================================================================================
+"""
+```
+
+## Files Missing Headers
+
+{list of files without proper headers}
+
+## Impact
+
+- Without context headers, code is harder to understand and maintain
+- Change history helps track evolution of the codebase
+- Interfaces section provides quick API reference
+
+---
+Filed from evaluation: results/{attempt_repo}.md
+```
+
+**Context Header Assessment:**
+
+| Coverage | Assessment | Action |
+|----------|------------|--------|
+| 100% | Excellent | No issue needed |
+| 75-99% | Good | Optional issue |
+| 50-74% | Partial | File enhancement issue |
+| <50% | Poor | File enhancement issue |
 
 ### 4. Create Issues
 File each extracted shortcoming as a separate GitHub issue.

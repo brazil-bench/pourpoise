@@ -2,7 +2,7 @@
 name: evaluate-attempt
 description: This SOP evaluates a completed brazil-bench attempt against the spec.md requirements, capturing metrics for comparison across orchestration patterns. Supports Python and Swift/iOS projects.
 type: anthropic-skill
-version: "1.3"
+version: "1.4"
 ---
 
 # Evaluate Benchmark Attempt
@@ -417,6 +417,117 @@ def neo4j_service(docker_services):
 
 ⚠️ **Issue:** Integration tests skip when Neo4j is not running.
 Tests should use testcontainers or pytest-docker to manage dependencies.
+```
+
+#### 3d. Context Header Blocks (REQUIRED)
+
+Every source code file MUST have a context header comment block that documents:
+1. **Purpose** - What the file/module does
+2. **Interfaces** - Key classes, functions, or APIs exposed
+3. **Change History** - Record of modifications (updated on every change)
+
+**Detection Commands:**
+
+```bash
+cd ./reviews/{attempt_repo}
+
+# Python: Check for docstrings or header comments in source files
+for f in $(find src -name "*.py" -not -name "__init__.py"); do
+  echo "=== $f ==="
+  head -50 "$f" | grep -E '""".*|^#.*Purpose|^#.*Context|CONTEXT BLOCK|Change History|Interfaces'
+done
+
+# Swift: Check for header comments
+for f in $(find Sources -name "*.swift" 2>/dev/null); do
+  echo "=== $f ==="
+  head -50 "$f" | grep -E '///|/\*\*|Purpose|Context|History'
+done
+
+# Count files with context headers vs total
+total=$(find src -name "*.py" -not -name "__init__.py" | wc -l)
+with_header=$(find src -name "*.py" -not -name "__init__.py" -exec head -30 {} \; -exec echo "---" \; | grep -l "CONTEXT\|Purpose\|Module:" | wc -l)
+echo "Files with headers: $with_header / $total"
+```
+
+**Required Header Format (Python):**
+
+```python
+"""
+================================================================================
+CONTEXT BLOCK
+================================================================================
+File: {filename}
+Module: {module.path}
+Purpose: {one-line description}
+
+Description:
+    {detailed description of what this module does}
+
+Interfaces:
+    - {ClassName}: {brief description}
+    - {function_name}(): {brief description}
+
+Dependencies:
+    - {module}: {why needed}
+
+Change History:
+    - {date}: {description of change}
+    - {date}: Initial creation
+================================================================================
+"""
+```
+
+**Required Header Format (Swift):**
+
+```swift
+//
+//  {FileName}.swift
+//  {ProjectName}
+//
+//  Purpose: {one-line description}
+//
+//  Interfaces:
+//    - {ClassName}: {brief description}
+//    - {functionName}(): {brief description}
+//
+//  Change History:
+//    - {date}: {description of change}
+//    - {date}: Initial creation
+//
+```
+
+**Assessment Criteria:**
+
+| Coverage | Assessment | Score Impact |
+|----------|------------|--------------|
+| 100% files have headers | Excellent | No penalty |
+| 75-99% files have headers | Good | -2 quality |
+| 50-74% files have headers | Partial | -5 quality |
+| <50% files have headers | Poor | -10 quality |
+
+**Constraints:**
+- You MUST check all source files for context headers
+- You MUST verify headers include purpose, interfaces, and change history
+- You MUST flag files missing headers for issue filing
+- You SHOULD note which files have incomplete headers (missing sections)
+
+**Document in Report:**
+
+```markdown
+## Context Header Compliance
+
+| Metric | Count |
+|--------|-------|
+| Source files | X |
+| With headers | Y |
+| Coverage | Z% |
+
+### Files Missing Headers
+- `src/module.py` - No header
+- `src/utils.py` - Missing change history
+
+### Assessment
+{Excellent/Good/Partial/Poor} - {X}% coverage
 ```
 
 ### 4. Measure Code Metrics
