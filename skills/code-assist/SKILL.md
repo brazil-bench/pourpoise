@@ -1,8 +1,8 @@
 ---
 name: code-assist
-description: This sop guides the implementation of code tasks using test-driven development principles, following a structured Explore, Plan, Code, Commit workflow. It balances automation with user collaboration while adhering to existing package patterns and prioritizing readability and extensibility. The agent acts as a Technical Implementation Partner and TDD Coach - providing guidance, generating test cases and implementation code that follows existing patterns, avoids over-engineering, and produces idiomatic, modern code in the target language.
+description: This sop guides the implementation of code tasks using test-driven development principles, following a structured Explore, Plan, Code, Commit workflow. It balances automation with user collaboration while adhering to existing package patterns and prioritizing readability and extensibility. The agent acts as a Technical Implementation Partner and TDD Coach - providing guidance, generating test cases and implementation code that follows existing patterns, avoids over-engineering, and produces idiomatic, modern code in the target language. Supports Python, Swift/iOS, and other languages.
 type: anthropic-skill
-version: "1.0"
+version: "1.1"
 ---
 
 # Code Assist
@@ -417,7 +417,7 @@ If the implementation encounters unexpected challenges:
 ## Best Practices
 
 ### Project Detection and Configuration
-- Detect project type by examining files (pyproject.toml, build.gradle, package.json, etc.)
+- Detect project type by examining files (pyproject.toml, build.gradle, package.json, Package.swift, *.xcodeproj, etc.)
 - Check for CODEASSIST.md for additional SOP constraints (see Important Notes)
 - Use project-appropriate build commands
 
@@ -430,6 +430,315 @@ If the implementation encounters unexpected challenges:
 - Use consolidated files: context.md, plan.md, progress.md
 - Focus on high-level concepts rather than detailed code
 - Track progress with markdown checklists
+
+---
+
+## Language-Specific Best Practices
+
+### Python Best Practices
+
+#### Testing Frameworks
+- **pytest**: Preferred for most Python projects
+- **pytest-bdd**: For BDD-style testing with Gherkin `.feature` files
+- **unittest**: Standard library, useful for simple cases
+
+#### pytest-bdd Critical Warning
+pytest-bdd does NOT support async step definitions. Always use synchronous functions:
+
+```python
+# ❌ WRONG - async tests fail silently with pytest-bdd
+@given("a database connection")
+async def given_db():
+    return await get_connection()
+
+# ✓ CORRECT - use sync functions
+@given("a database connection")
+def given_db():
+    return get_connection_sync()
+
+# ✓ CORRECT - wrap async calls in sync helper
+def run_async(coro):
+    return asyncio.get_event_loop().run_until_complete(coro)
+
+@given("a player search result")
+def given_player_search(context):
+    context["result"] = run_async(search_player("Neymar"))
+```
+
+#### Project Structure
+```
+project/
+├── src/
+│   └── package_name/
+│       ├── __init__.py
+│       └── module.py
+├── tests/
+│   ├── conftest.py
+│   ├── features/           # BDD feature files
+│   │   └── example.feature
+│   └── step_defs/          # BDD step definitions
+│       └── test_example.py
+├── pyproject.toml
+└── README.md
+```
+
+---
+
+### Swift/iOS Best Practices
+
+#### Testing Frameworks
+- **XCTest**: Apple's native testing framework (preferred for most iOS projects)
+- **Quick/Nimble**: BDD-style testing with more expressive syntax
+- **swift-testing**: New Swift-native testing framework (Swift 6+)
+
+#### XCTest Structure
+```swift
+import XCTest
+@testable import YourApp
+
+final class ViewModelTests: XCTestCase {
+    var sut: ViewModel!  // System Under Test
+
+    override func setUp() {
+        super.setUp()
+        sut = ViewModel()
+    }
+
+    override func tearDown() {
+        sut = nil
+        super.tearDown()
+    }
+
+    func test_whenActionPerformed_thenExpectedResult() {
+        // Given
+        let input = "test"
+
+        // When
+        let result = sut.process(input)
+
+        // Then
+        XCTAssertEqual(result, "expected")
+    }
+}
+```
+
+#### Async Testing in Swift
+```swift
+// ✓ CORRECT - async test methods (iOS 15+)
+func test_asyncOperation() async throws {
+    let result = await sut.fetchData()
+    XCTAssertNotNil(result)
+}
+
+// ✓ CORRECT - using expectations for older iOS versions
+func test_asyncWithExpectation() {
+    let expectation = expectation(description: "Fetch completes")
+
+    sut.fetchData { result in
+        XCTAssertNotNil(result)
+        expectation.fulfill()
+    }
+
+    wait(for: [expectation], timeout: 5.0)
+}
+```
+
+#### iOS Architecture Patterns
+
+**MVVM (Model-View-ViewModel)** - Most common for SwiftUI:
+```swift
+// ViewModel
+@MainActor
+class ContentViewModel: ObservableObject {
+    @Published var items: [Item] = []
+    @Published var isLoading = false
+
+    private let service: ItemServiceProtocol
+
+    init(service: ItemServiceProtocol = ItemService()) {
+        self.service = service
+    }
+
+    func loadItems() async {
+        isLoading = true
+        defer { isLoading = false }
+        items = await service.fetchItems()
+    }
+}
+
+// View
+struct ContentView: View {
+    @StateObject private var viewModel = ContentViewModel()
+
+    var body: some View {
+        List(viewModel.items) { item in
+            Text(item.title)
+        }
+        .task { await viewModel.loadItems() }
+    }
+}
+```
+
+**The Composable Architecture (TCA)** - For complex state management:
+```swift
+@Reducer
+struct Feature {
+    @ObservableState
+    struct State: Equatable {
+        var count = 0
+    }
+
+    enum Action {
+        case incrementTapped
+        case decrementTapped
+    }
+
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .incrementTapped:
+                state.count += 1
+                return .none
+            case .decrementTapped:
+                state.count -= 1
+                return .none
+            }
+        }
+    }
+}
+```
+
+#### Dependency Injection in Swift
+```swift
+// Protocol-based DI (preferred)
+protocol NetworkServiceProtocol {
+    func fetch<T: Decodable>(_ type: T.Type, from url: URL) async throws -> T
+}
+
+class NetworkService: NetworkServiceProtocol {
+    func fetch<T: Decodable>(_ type: T.Type, from url: URL) async throws -> T {
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try JSONDecoder().decode(type, from: data)
+    }
+}
+
+// Mock for testing
+class MockNetworkService: NetworkServiceProtocol {
+    var mockResult: Any?
+
+    func fetch<T: Decodable>(_ type: T.Type, from url: URL) async throws -> T {
+        return mockResult as! T
+    }
+}
+```
+
+#### SwiftUI vs UIKit Decision Matrix
+
+| Factor | SwiftUI | UIKit |
+|--------|---------|-------|
+| iOS target | 14+ (best at 16+) | Any |
+| UI complexity | Simple-moderate | Complex/custom |
+| Animations | Standard | Highly custom |
+| Team experience | Modern Swift | Legacy codebase |
+| Preview support | Excellent | Limited |
+
+#### iOS Project Structure
+```
+MyApp/
+├── MyApp/
+│   ├── App/
+│   │   ├── MyAppApp.swift       # @main entry point
+│   │   └── AppDelegate.swift    # UIKit lifecycle (if needed)
+│   ├── Features/
+│   │   ├── Home/
+│   │   │   ├── HomeView.swift
+│   │   │   ├── HomeViewModel.swift
+│   │   │   └── HomeModels.swift
+│   │   └── Settings/
+│   │       └── ...
+│   ├── Core/
+│   │   ├── Network/
+│   │   │   ├── NetworkService.swift
+│   │   │   └── Endpoints.swift
+│   │   ├── Storage/
+│   │   │   └── UserDefaults+Extensions.swift
+│   │   └── Utilities/
+│   │       └── ...
+│   ├── Models/
+│   │   └── User.swift
+│   └── Resources/
+│       ├── Assets.xcassets
+│       └── Info.plist
+├── MyAppTests/
+│   ├── Features/
+│   │   └── Home/
+│   │       └── HomeViewModelTests.swift
+│   └── Mocks/
+│       └── MockNetworkService.swift
+├── MyAppUITests/
+│   └── HomeUITests.swift
+└── Package.swift or MyApp.xcodeproj
+```
+
+#### Build Commands
+```bash
+# Xcode project
+xcodebuild -project MyApp.xcodeproj -scheme MyApp -sdk iphonesimulator build
+
+# Swift Package
+swift build
+swift test
+
+# With destinations
+xcodebuild -project MyApp.xcodeproj -scheme MyApp \
+    -destination 'platform=iOS Simulator,name=iPhone 15' \
+    test
+
+# Clean build
+xcodebuild clean build -project MyApp.xcodeproj -scheme MyApp
+```
+
+#### Common Swift Patterns
+
+**Result Type for Error Handling:**
+```swift
+func fetchUser(id: String) async -> Result<User, NetworkError> {
+    do {
+        let user = try await networkService.fetch(User.self, from: userURL(id))
+        return .success(user)
+    } catch {
+        return .failure(.networkError(error))
+    }
+}
+```
+
+**Property Wrappers:**
+```swift
+@propertyWrapper
+struct UserDefault<T> {
+    let key: String
+    let defaultValue: T
+
+    var wrappedValue: T {
+        get { UserDefaults.standard.object(forKey: key) as? T ?? defaultValue }
+        set { UserDefaults.standard.set(newValue, forKey: key) }
+    }
+}
+
+// Usage
+@UserDefault(key: "hasSeenOnboarding", defaultValue: false)
+var hasSeenOnboarding: Bool
+```
+
+#### Code Style Guidelines
+- Use `let` over `var` when possible (immutability)
+- Prefer value types (structs) over reference types (classes)
+- Use meaningful names: `isLoading`, `didComplete`, `userCount`
+- Mark classes `final` unless designed for inheritance
+- Use `@MainActor` for UI-bound code
+- Prefer `async/await` over completion handlers
+- Use `guard` for early returns
+- Avoid force unwrapping (`!`) except in tests
 
 ## Artifacts
 • {documentation_dir}/implementation/{task_name}/
