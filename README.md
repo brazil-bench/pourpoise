@@ -74,12 +74,256 @@ This repository includes skills in the `skills/` directory that provide Standard
 | `evaluate-attempt` | Evaluate a completed attempt | "evaluate attempt 2025-10-30-python-hive" |
 | `compare-attempts` | Generate leaderboard comparing all attempts | "compare attempts" |
 | `file-issues` | File GitHub issues for shortcomings found in evaluation | "file issues for 2025-12-13-python-claude-hive" |
+| `re-evaluate` | Re-evaluate after issues are fixed | "re-evaluate 2025-12-13-python-claude-hive" |
 | `codebase-summary` | Generate documentation for a codebase | "summarize codebase reviews/attempt-name" |
 | `pdd` | Prompt-Driven Development planning | "help me design a new feature" |
 | `code-task-generator` | Generate code task files | "generate tasks from my PDD plan" |
 | `code-assist` | Assist with code implementation | "help me implement this task" |
 
 Skills are invoked using natural language in Claude Code.
+
+## SOP Workflow
+
+The benchmark evaluation system follows a structured workflow with four main SOPs that work together to evaluate, track, and improve attempt repositories.
+
+### Workflow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         BENCHMARK EVALUATION LIFECYCLE                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+  │   EVALUATE   │────▶│    FILE      │────▶│     FIX      │────▶│ RE-EVALUATE  │
+  │   ATTEMPT    │     │   ISSUES     │     │   ISSUES     │     │              │
+  └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
+         │                    │                    │                    │
+         ▼                    ▼                    ▼                    ▼
+  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+  │ results/     │     │ GitHub       │     │ Attempt      │     │ Updated      │
+  │ {repo}.md    │     │ Issues       │     │ Repository   │     │ Report       │
+  └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
+         │                                                              │
+         └──────────────────────┬───────────────────────────────────────┘
+                                ▼
+                         ┌──────────────┐
+                         │   COMPARE    │
+                         │   ATTEMPTS   │
+                         └──────────────┘
+                                │
+                                ▼
+                         ┌──────────────┐
+                         │ LEADERBOARD  │
+                         │   + README   │
+                         └──────────────┘
+```
+
+### SOP Descriptions
+
+#### 1. Evaluate Attempt (`evaluate-attempt`)
+
+**Purpose:** Initial evaluation of a completed benchmark attempt against spec requirements.
+
+**Inputs:**
+- Attempt repository name (e.g., `2025-12-13-python-claude-hive`)
+
+**Outputs:**
+- `results/{attempt_repo}.md` - Detailed evaluation report
+- `results/{attempt_repo}-summary/` - Generated codebase documentation
+
+**What it checks:**
+| Category | Checks |
+|----------|--------|
+| Spec Integrity | Verifies spec.md wasn't modified |
+| Test Results | Runs tests, captures pass/fail/skip counts |
+| Skip Analysis | Detects inflated test counts from `pytest.skip()` |
+| Code Metrics | LOC, files, dependencies, complexity |
+| Git Timeline | Separates agent vs human commits |
+| Spec Compliance | Assesses each requirement (16 total) |
+| Documentation | README quality (setup, MCP, examples) |
+| Data Strategy | Real Kaggle data vs simulated |
+
+**Example:**
+```bash
+evaluate attempt 2025-12-13-python-claude-hive
+```
+
+---
+
+#### 2. File Issues (`file-issues`)
+
+**Purpose:** Parse evaluation reports and create GitHub issues for shortcomings.
+
+**Inputs:**
+- Attempt repository name
+- Evaluation report (auto-detected at `results/{repo}.md`)
+
+**Outputs:**
+- GitHub issues on `brazil-bench/{attempt_repo}`
+
+**Issue Types Created:**
+
+| Issue Type | Title Prefix | Label | Trigger |
+|------------|--------------|-------|---------|
+| Missing Requirement | `[Missing]` | `enhancement` | Unchecked spec items |
+| Test Quality | `[Test Quality]` | `bug` or `enhancement` | Skip ratio >10%, bad patterns |
+| Documentation | `[Docs]` | `documentation` | Missing README elements |
+| Quality | `[Quality]` | `enhancement` | Architecture concerns |
+| Compliance Summary | `[Compliance]` | `enhancement` | Links all issues together |
+
+**Example:**
+```bash
+file issues for 2025-12-13-python-claude-hive
+```
+
+**Dry run (preview without creating):**
+```bash
+file issues for 2025-12-13-python-claude-hive --dry-run
+```
+
+---
+
+#### 3. Re-Evaluate (`re-evaluate`)
+
+**Purpose:** After issues are fixed, re-evaluate the attempt and update reports.
+
+**Inputs:**
+- Attempt repository name
+- Optional: `--full-reeval` for complete re-evaluation
+
+**Outputs:**
+- Updated `results/{attempt_repo}.md` with Re-Evaluation History
+- New issues for any regressions found
+- Updated leaderboard if rank changes
+
+**What it does:**
+
+| Step | Description |
+|------|-------------|
+| 1. Check Changes | Pull latest commits from attempt repo |
+| 2. Identify Closed Issues | List issues closed since last evaluation |
+| 3. Targeted Re-Eval | Re-check only affected areas |
+| 4. Update Report | Add metrics diff and re-evaluation history |
+| 5. Recalculate Score | Apply scoring formula with new metrics |
+| 6. File Regressions | Create `[Regression]` issues if problems found |
+
+**Example:**
+```bash
+re-evaluate 2025-12-13-python-claude-hive
+```
+
+---
+
+#### 4. Compare Attempts (`compare-attempts`)
+
+**Purpose:** Generate ranked leaderboard from all evaluation reports.
+
+**Inputs:**
+- All reports in `results/*.md`
+
+**Outputs:**
+- `results/LEADERBOARD.md` - Detailed comparison
+- Updated README.md leaderboard table
+
+**Scoring Formula:**
+```
+Score = (Spec % × 50) + (Tests × 30) + (Quality × 15) + (Efficiency × 5)
+
+Skip Penalty = max(0, (skip_ratio - 0.10) × 50)
+```
+
+**Example:**
+```bash
+compare attempts
+```
+
+---
+
+### Complete Workflow Example
+
+Here's a typical workflow for evaluating and improving an attempt:
+
+```bash
+# Step 1: Initial evaluation
+evaluate attempt 2025-12-13-python-claude-hive
+# Creates: results/2025-12-13-python-claude-hive.md
+
+# Step 2: File issues for shortcomings
+file issues for 2025-12-13-python-claude-hive
+# Creates: GitHub issues on brazil-bench/2025-12-13-python-claude-hive
+
+# Step 3: Fix issues in the attempt repo
+cd reviews/2025-12-13-python-claude-hive
+claude "Fix all open issues. Run: gh issue list to see them."
+
+# Step 4: Re-evaluate after fixes
+re-evaluate 2025-12-13-python-claude-hive
+# Updates: results/2025-12-13-python-claude-hive.md
+
+# Step 5: Update leaderboard
+compare attempts
+# Updates: results/LEADERBOARD.md and README.md
+```
+
+### Fixing Issues in Attempt Repos
+
+When running Claude in each attempt repo to fix issues, use these prompts:
+
+**For Missing Requirements:**
+```
+Fix GitHub issue #N - [Missing] {requirement}
+Read the issue: gh issue view N
+Implement the missing requirement following the spec.
+Run tests after implementation.
+```
+
+**For Test Quality:**
+```
+Fix GitHub issue #N - skipped tests
+Re-run tests and either:
+1. Implement missing functionality so tests pass
+2. Remove stub tests that can't run
+3. Add proper skip markers with clear reasons
+```
+
+**For Documentation:**
+```
+Fix GitHub issue #N - README documentation
+Update README.md to include:
+1. Setup Instructions (prerequisites, installation)
+2. MCP Server Setup (how to start, connect Claude)
+3. Example Q&A (sample questions and responses)
+```
+
+**One-liner for all issues:**
+```
+Fix all open issues in this repo. Run: gh issue list to see them.
+Address each one, run tests, and commit when done.
+```
+
+### Automation
+
+**Check all repos for closed issues:**
+```bash
+for repo in $(gh repo list brazil-bench --json name -q '.[].name' | grep -E "^20[0-9]{2}-"); do
+  closed=$(gh issue list -R brazil-bench/$repo --state closed --json number -q 'length')
+  open=$(gh issue list -R brazil-bench/$repo --state open --json number -q 'length')
+  if [ "$closed" -gt 0 ] || [ "$open" -gt 0 ]; then
+    echo "$repo: $open open, $closed closed"
+  fi
+done
+```
+
+**Batch re-evaluate all repos with closed issues:**
+```bash
+for repo in $(gh repo list brazil-bench --json name -q '.[].name' | grep -E "^20[0-9]{2}-"); do
+  closed=$(gh issue list -R brazil-bench/$repo --state closed --json number -q 'length')
+  if [ "$closed" -gt 0 ]; then
+    echo "Re-evaluating $repo..."
+    # re-evaluate $repo
+  fi
+done
+```
 
 ## Usage
 
@@ -212,16 +456,24 @@ The methodology uses "effective tests" (passed + failed, excluding skipped) rath
 - `skills/` - Claude Code skills for benchmark management
   - `evaluate-attempt/` - Evaluate a single benchmark attempt
   - `compare-attempts/` - Compare attempts and generate leaderboard
+  - `file-issues/` - File GitHub issues from evaluation reports
+  - `re-evaluate/` - Re-evaluate attempts after issues are fixed
   - `codebase-summary/` - Generate codebase documentation
   - `pdd/` - Prompt-Driven Development planning
   - `code-task-generator/` - Generate code task files
   - `code-assist/` - Code implementation assistance
 - `sop/` - Source SOP files (used to generate skills)
+  - `evaluate-attempt.sop.md` - Initial evaluation SOP
+  - `compare-attempts.sop.md` - Leaderboard generation SOP
+  - `file-issues.sop.md` - Issue filing SOP
+  - `re-evaluate.sop.md` - Re-evaluation lifecycle SOP
 - `results/` - Evaluation reports and documentation (generated)
   - `LEADERBOARD.md` - Ranked comparison of all attempts
   - `{attempt_repo}.md` - Individual evaluation report
   - `{attempt_repo}-summary/` - Generated codebase documentation
 - `reviews/` - Cloned attempt repositories for evaluation (gitignored)
+- `tasks/` - Benchmark task definitions
+  - `beads/spec.md` - The benchmark specification
 
 ## Regenerating Skills
 
