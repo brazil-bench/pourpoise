@@ -34,7 +34,7 @@ Where:
 |------|---------|---------|-------|------|-------|-------------|-------|--------|
 | 1 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **91.8** | 16/16 | 59 | ✗ External | 20% | 2 open |
 | 2 🥈 | 2025-10-30-python-hive | Hive v1 | **90.9** | 15/16 | 64 | ✗ External | 0% | 3 open |
-| 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 0% | 1 open |
+| 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 0% | 2 open |
 | 4 | 2025-12-13-python-claude-hive | Hive v2 | **86.0** | 16/16 | 43 | ✓ testcontainers | 0% | 0 |
 | 5 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 3% | 1 open |
 | 6 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0% | 0 |
@@ -255,16 +255,16 @@ due to slightly lower compliance (15/16 vs 16/16).
 
 | Attempt | Open | Closed | Total | Categories |
 |---------|------|--------|-------|------------|
-| 2025-12-14-python-claude-beads-2 | 1 | 0 | 1 | Test Quality |
-| 2025-10-30-python-hive | 2 | 0 | 2 | Missing, Compliance |
-| **2025-12-15-python-claude-ruvector** | **0** | **1** | 1 | ~~Test Quality~~ Fixed |
-| **2025-12-13-python-claude-swarm** | **0** | **5** | 5 | ~~Missing, Docs, Compliance~~ All Fixed |
-| **2025-12-13-python-claude-hive** | **0** | **6** | 6 | ~~Missing, Test Quality, Compliance~~ All Fixed |
-| **2025-12-01-python-claude-beads** | **0** | **7** | 7 | ~~Missing, Docs, Compliance~~ All Fixed |
-| 2025-12-14-python-claude-beads | 3 | 0 | 3 | Missing, Compliance |
-| 2025-09-30-python-swarm | 4 | 0 | 4 | Missing, Test Quality, Compliance |
+| 2025-12-14-python-claude-beads-2 | 2 | 0 | 2 | Test Quality |
+| 2025-10-30-python-hive | 3 | 0 | 3 | Missing, Compliance, Test Quality |
+| 2025-12-15-python-claude-ruvector | 2 | 1 | 3 | Test Quality (testcontainers), Bug (path) |
+| 2025-12-13-python-claude-swarm | 1 | 5 | 6 | Test Quality (testcontainers) |
+| **2025-12-13-python-claude-hive** | **0** | **7** | 7 | ~~All Fixed~~ ✓ |
+| 2025-12-01-python-claude-beads | 1 | 7 | 8 | Test Quality (in-memory mock) |
+| **2025-12-14-python-claude-beads** | **0** | **4** | 4 | ~~All Fixed~~ ✓ |
+| 2025-09-30-python-swarm | 5 | 0 | 5 | Missing, Test Quality, Compliance |
 
-**Total Open Issues:** 10 (was 29, -19 closed)
+**Total Open Issues:** 14
 
 ### Issue Distribution by Type
 

@@ -17,7 +17,7 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 |------|---------|---------|-------|------------|-------|-------------|--------|
 | 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **91.8** | 16/16 | 59 | ✗ External | 2 open |
 | 🥈 | 2025-10-30-python-hive | Hive v1 | **90.9** | 15/16 | 64 | ✗ External | 3 open |
-| 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 1 open |
+| 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 2 open |
 | 4 | 2025-12-13-python-claude-hive | Hive v2 | **86.0** | 16/16 | 43 | ✓ testcontainers | 0 |
 | 5 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 1 open |
 | 6 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0 |
