@@ -36,10 +36,10 @@ Where:
 | 2 🥈 | 2025-10-30-python-hive | Hive v1 | **90.9** | 15/16 | 64 | ✗ External | 0% | 3 open |
 | 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 0% | 2 open |
 | 4 | 2025-12-13-python-claude-hive | Hive v2 | **86.0** | 16/16 | 43 | ✓ testcontainers | 0% | 0 |
-| 5 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 3% | 1 open |
-| 6 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0% | 0 |
-| 7 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 0% | 1 open |
-| 8 | 2025-09-30-python-swarm | Swarm v1 | **72.7** | 16/16 | 39 | ✓ testcontainers | 0% | 1 open |
+| 5 | 2025-09-30-python-swarm | Swarm v1 | **83.5** | 16/16 | 63 | ✓ testcontainers | 0% | 0 |
+| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 3% | 1 open |
+| 7 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0% | 0 |
+| 8 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 0% | 1 open |
 
 ---
 
@@ -56,7 +56,7 @@ Where:
 | Hive v2 | 43 | 0 | **43** | None (testcontainers) | Excellent |
 | Beads v2 | 25 | 0 | **25** | None (testcontainers) | Excellent |
 | Beads v1 | 18 | 0 | **18** | None | Clean |
-| Swarm v1 | 39 | 0 | **39** | None (testcontainers) | Excellent |
+| Swarm v1 | 63 | 0 | **63** | None (testcontainers) | Excellent |
 
 ### Integration Test Quality (v4 Requirement)
 
@@ -81,7 +81,7 @@ Where:
 | Attempt | Initial Score | Current Score | Change | Reason |
 |---------|---------------|---------------|--------|--------|
 | Hive v2 | 56.5 | **86.0** | +29.5 | 7 issues closed, testcontainers implemented, 0 skips |
-| Swarm v1 | 54.2 | **72.7** | +18.5 | 5 issues closed, testcontainers implemented, 16/16 compliance |
+| Swarm v1 | 54.2 | **83.5** | +29.3 | 7 issues closed, testcontainers + 63 tests, 16/16 compliance |
 | Swarm v2 | 65.8 | **82.8** | +17.0 | 5 issues closed, -1.5 integration penalty |
 | Beads v1 | 64.7 | **75.5** | +10.8 | 7 issues closed, -1.5 integration penalty (mock not persistent) |
 | Beads v2 | 68.6 | **78.4** | +9.8 | 4 issues closed, testcontainers implemented, 16/16 compliance |
@@ -99,7 +99,7 @@ Where:
 | Hive v2 | 50.00 | 19.35 | 13.50 | 3.12 | **86.0** |
 | Beads v1 | 50.00 | 8.10 | 13.50 | 3.91 | **75.5** |
 | Beads v2 | 50.00 | 11.25 | 13.50 | 3.60 | **78.4** |
-| Swarm v1 | 50.00 | 17.55 | 4.50 | 0.66 | **72.7** |
+| Swarm v1 | 50.00 | 28.35 | 4.50 | 0.66 | **83.5** |
 
 *Quality now includes -10 integration penalty for non-self-contained tests (×15% = -1.5 points)*
 
@@ -158,13 +158,13 @@ Total: 86.0  [was 56.5, +29.5 improvement]
 |--------|----------|---------|----------|----------|---------|----------|----------|----------|
 | **Pattern** | Beads | Hive | Hive+RuVector | Swarm | Hive | Beads | Beads | Swarm |
 | **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 |
-| **Effective Tests** | 59 | 64 | 61 | 37 | 43 | 18 | 25 | 39 |
+| **Effective Tests** | 59 | 64 | 61 | 37 | 43 | 18 | 25 | 63 |
 | **Skip Ratio** | 20% | 0% | 0% | ~3% | 0% | 0% | 0% | 0% |
 | **Lines of Code** | 4,947 | 3,545 | 8,751 | 5,546 | 3,754 | 2,194 | 2,793 | 8,683 |
 | **Fix Commits** | 0 | 1 | 1 | 0 | 1 | 0 | 1 | 7 |
 | **Duration** | ~23m | ~41m | ~2h 18m | ~1h 54m | ~41m | ~11m | ~14m | ~1h 49m |
 | **Real Data** | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Open Issues** | 2 | 3 | 2 | 1 | **0** | 1 | **0** | 1 |
+| **Open Issues** | 2 | 3 | 2 | 1 | **0** | 1 | **0** | **0** |
 
 ---
 
@@ -175,7 +175,7 @@ Total: 86.0  [was 56.5, +29.5 improvement]
 | **Hive** | 2 | 87.6 | 2nd | 50 | Strong pattern (v1: 92.4, v2: 82.7) |
 | **Beads** | 3 | 80.1 | 1st | 32 | Most consistent pattern |
 | **RuVector** | 1 | 91.6 | 3rd | 61 | Innovative architecture |
-| **Swarm** | 2 | 77.8 | 5th | 38 | Both now have testcontainers (v1: 72.7, v2: 82.8) |
+| **Swarm** | 2 | 83.2 | 5th | 50 | Both improved (v1: 83.5, v2: 82.8), v1 now has testcontainers |
 
 ---
 
@@ -263,9 +263,9 @@ due to slightly lower compliance (15/16 vs 16/16).
 | **2025-12-13-python-claude-hive** | **0** | **7** | 7 | ~~All Fixed~~ ✓ |
 | 2025-12-01-python-claude-beads | 1 | 7 | 8 | Test Quality (in-memory mock) |
 | **2025-12-14-python-claude-beads** | **0** | **4** | 4 | ~~All Fixed~~ ✓ |
-| 2025-09-30-python-swarm | 1 | 6 | 7 | Bug (Neo4j auth in e2e) |
+| **2025-09-30-python-swarm** | **0** | **7** | 7 | ~~All Fixed~~ ✓ |
 
-**Total Open Issues:** 10
+**Total Open Issues:** 9
 
 ### Issue Distribution by Type
 

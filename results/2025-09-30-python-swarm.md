@@ -13,17 +13,17 @@
 
 ## Re-evaluation (2026-01-04)
 
-All 5 issues closed after fix commit:
+All 7 issues closed after fix commits:
 - ✓ #1: Player transfers relationship - implemented
 - ✓ #2: Coach manages relationship - implemented
 - ✓ #3: Compliance now 16/16 (was 14/16)
 - ✓ #4: pytest-bdd with Gherkin .feature files
 - ✓ #5: testcontainers for self-contained tests
+- ✓ #6: E2E method signature errors - fixed
+- ✓ #7: Neo4j auth in e2e tests - fixed
 
-**Score Change: 54.2 → 72.7 (+18.5 points)**
-
-New issue filed:
-- #6: E2E tests have invalid method signature errors (2 test files fail to collect)
+**Score Change: 54.2 → 83.5 (+29.3 points)**
+**Rank Change: #8 → #5**
 
 ## Metrics
 
@@ -37,10 +37,10 @@ New issue filed:
 | Commits (Human) | 22 |
 | Commits (Fix-issues) | 1 |
 | Fix Commits | 7 |
-| Tests (Total) | 39 |
-| Tests (Passed) | 39 |
+| Tests (Total) | 63 |
+| Tests (Passed) | 63 |
 | **Tests (Skipped)** | **0** |
-| **Effective Tests** | **39** |
+| **Effective Tests** | **63** |
 | **Skip Ratio** | **0%** |
 
 ## Test Skip Analysis
@@ -156,19 +156,21 @@ Key design decisions:
 ## Test Results Summary
 
 ```
-Total Tests: 39 (pytest-bdd with Gherkin .feature files)
-Passed: 39 (100%)
+Total Tests: 63 (pytest-bdd with Gherkin .feature files + e2e tests)
+Passed: 63 (100%)
 Skipped: 0
 Failed: 0
 
 Test Breakdown:
-- Match scenarios: 15 tests
-- Player scenarios: 10 tests
-- Team scenarios: 14 tests
+- Match scenarios: 15 tests (step_defs)
+- Player scenarios: 10 tests (step_defs)
+- Team scenarios: 14 tests (step_defs)
+- Player e2e: 10 tests
+- Team e2e: 14 tests
 
 Integration: testcontainers with Neo4j 5.15.0
 
-Note: 2 e2e test files fail to collect due to method signature errors (issue #6)
+All issues resolved - tests fully self-contained with testcontainers.
 ```
 
 ## Data Coverage
