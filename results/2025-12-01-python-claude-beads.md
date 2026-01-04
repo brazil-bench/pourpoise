@@ -5,20 +5,20 @@
 | Metric | Value |
 |--------|-------|
 | **Pattern** | Beads (Issue-Driven AI) |
-| **Spec Compliance** | 12/16 requirements |
+| **Spec Compliance** | 16/16 requirements |
 | **Tests** | 18 BDD scenarios |
 | **Autonomous Duration** | ~11 min |
-| **Documentation** | See `2025-12-01-python-claude-beads-summary/` |
+| **Documentation** | Excellent (full README with setup, MCP config, examples) |
 
 ## Metrics
 
 | Metric | Value |
 |--------|-------|
-| Lines of Code (src/) | 1,826 |
+| Lines of Code (src/) | 2,194 |
 | Python Files | 14 |
 | Dependencies | 8 |
-| Commits (Total) | 7 |
-| Commits (Agent) | 5 |
+| Commits (Total) | 9 |
+| Commits (Agent) | 7 |
 | Commits (Human) | 2 |
 | Fix Commits | 0 |
 | Tests (Total) | 18 |
@@ -26,6 +26,7 @@
 | **Tests (Skipped)** | **0** |
 | **Effective Tests** | **18** |
 | **Skip Ratio** | **0%** |
+| **Open Issues** | **0** |
 
 ## Development Duration Breakdown
 
@@ -80,30 +81,33 @@ Dependencies: Phase 1 → Phase 2 → Phase 3 (sequential blocking)
 - [x] Stadium entity (stadium_id, name, city, capacity)
 - [x] Coach entity (coach_id, name, nationality, birth_date)
 
-### Relationships (4/6)
+### Relationships (6/6)
 - [x] Player → PLAYS_FOR → Team
 - [x] Player → SCORED_IN → Match
 - [x] Team → COMPETED_IN → Match
 - [x] Match → PART_OF → Competition
-- [ ] Match → PLAYED_AT → Stadium (model exists, not in queries)
-- [ ] Coach → MANAGES → Team (model exists, not in queries)
+- [x] Match → PLAYED_AT → Stadium (via get_matches_at_stadium)
+- [x] Coach → MANAGES → Team (via get_team_coach, get_coach_teams)
 
-### MCP Tools (12/15 spec tools)
+### MCP Tools (18/15 spec tools - exceeds spec)
 - [x] search_player
 - [x] get_player_stats
 - [x] get_player_career
+- [x] get_player_transfers
 - [x] search_team
 - [x] get_team_roster
 - [x] get_team_stats
+- [x] get_team_history
+- [x] get_team_coach
+- [x] get_coach_teams
 - [x] get_match_details
+- [x] get_matches_at_stadium
 - [x] search_matches
 - [x] get_head_to_head
 - [x] get_competition_top_scorers
+- [x] get_competition_standings
 - [x] find_common_teammates
 - [x] find_players_who_played_for_both_teams
-- [ ] get_player_transfers (not implemented)
-- [ ] get_team_history (not implemented)
-- [ ] get_competition_standings (not implemented)
 
 ### Data Integration (2/2)
 - [x] Neo4j graph database
@@ -117,7 +121,7 @@ Dependencies: Phase 1 → Phase 2 → Phase 3 (sequential blocking)
 
 The implementation uses a **minimalist architecture**:
 
-1. **Single Server File**: All 12 tools in `server.py`
+1. **Single Server File**: All 18 tools in `server.py`
 2. **Simple Dataclasses**: Standard Python dataclasses (no Pydantic)
 3. **Direct Neo4j**: Simple database connection layer
 4. **Modern Tooling**: Python 3.12, pyproject.toml with hatchling
@@ -170,5 +174,44 @@ Fix commits: 0 (clean first-time implementation)
 
 ---
 
-*Evaluation completed: 2025-12-13*
+## Re-Evaluation History
+
+### 2025-01-04 - Re-evaluation after issue fixes
+
+**Closed Issues Addressed:**
+- #1: [Missing] Match → PLAYED_AT → Stadium relationship query - **Verified Fixed** (get_matches_at_stadium)
+- #2: [Missing] Coach → MANAGES → Team relationship query - **Verified Fixed** (get_team_coach, get_coach_teams)
+- #3: [Missing] get_player_transfers MCP tool - **Verified Fixed**
+- #4: [Missing] get_team_history MCP tool - **Verified Fixed**
+- #5: [Missing] get_competition_standings MCP tool - **Verified Fixed**
+- #6: [Compliance] Spec compliance at 75% (12/16 requirements) - **Verified Fixed** (now 16/16)
+- #7: [Docs] README missing setup instructions and usage examples - **Verified Fixed** (full documentation)
+
+**Updated Metrics:**
+
+| Metric | Previous | Current | Change |
+|--------|----------|---------|--------|
+| Spec Compliance | 12/16 | 16/16 | +4 |
+| MCP Tools | 12 | 18 | +6 |
+| Lines of Code | 1,826 | 2,194 | +368 |
+| Commits | 7 | 9 | +2 |
+| Open Issues | 7 | 0 | -7 |
+| Documentation | Poor | Excellent | Improved |
+
+**New Score Calculation:**
+```
+Compliance: 16/16 (100%) × 50 = 50.00
+Tests: min(100, 18×1.5)=27 × 30 = 8.10
+Quality: (100 - 0 - 0) × 15 = 15.00
+Efficiency: (100 - 21.94) × 5 = 3.90
+Total = 77.0
+```
+
+**Previous Score:** 64.7
+**New Score:** 77.0 (+12.3)
+
+---
+
+*Initial evaluation: 2025-12-13*
+*Re-evaluation: 2025-01-04*
 *Repository: https://github.com/brazil-bench/2025-12-01-python-claude-beads*

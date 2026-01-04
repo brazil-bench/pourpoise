@@ -28,9 +28,9 @@ Where:
 | 1 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **93.3** | 16/16 | 59 | 20% | ~23m | 1 open |
 | 2 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m | 2 open |
 | 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m | 1 open |
-| 4 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m | 3 open |
-| 5 | 2025-12-13-python-claude-swarm | Swarm v2 | **65.8** | 10/16 | 37 | 3% | ~1h 54m | 5 open |
-| 6 | 2025-12-01-python-claude-beads | Beads v1 | **64.7** | 12/16 | 18 | 0% | ~11m | 7 open |
+| 4 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
+| 5 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m | 3 open |
+| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | **65.8** | 10/16 | 37 | 3% | ~1h 54m | 5 open |
 | 7 | 2025-12-13-python-claude-hive | Hive v2 | **56.5** | 13/16 | ~10 | **84%** | ~37m | 6 open |
 | 8 | 2025-09-30-python-swarm | Swarm v1 | **55.7** | 14/16 | 15 | 0% | ~1h 49m | 4 open |
 
@@ -121,17 +121,17 @@ Efficiency: (100 - 61.65) × 5 = 1.92
 
 ## Detailed Metrics Comparison
 
-| Metric | Beads v3 | Hive v1 | RuVector | Beads v2 | Swarm v2 | Beads v1 | Hive v2 | Swarm v1 |
+| Metric | Beads v3 | Hive v1 | RuVector | Beads v1 | Beads v2 | Swarm v2 | Hive v2 | Swarm v1 |
 |--------|----------|---------|----------|----------|----------|----------|---------|----------|
-| **Pattern** | Beads | Hive | Hive+RuVector | Beads | Swarm | Beads | Hive | Swarm |
-| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 14/16 | 10/16 | 12/16 | 13/16 | 14/16 |
-| **Effective Tests** | 59 | 64 | 61 | 18 | ~37 | 18 | ~10 | 15 |
-| **Skip Ratio** | 20% | 0% | 0% | 0% | ~3% | 0% | **84%** | 0% |
-| **Lines of Code** | 4,947 | 3,545 | 8,751 | 3,511 | 4,227 | 1,826 | 6,165 | 8,683 |
+| **Pattern** | Beads | Hive | Hive+RuVector | Beads | Beads | Swarm | Hive | Swarm |
+| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 14/16 | 10/16 | 13/16 | 14/16 |
+| **Effective Tests** | 59 | 64 | 61 | 18 | 18 | ~37 | ~10 | 15 |
+| **Skip Ratio** | 20% | 0% | 0% | 0% | 0% | ~3% | **84%** | 0% |
+| **Lines of Code** | 4,947 | 3,545 | 8,751 | 2,194 | 3,511 | 4,227 | 6,165 | 8,683 |
 | **Fix Commits** | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 7 |
-| **Duration** | ~23m | ~41m | ~2h 18m | ~14m | ~1h 54m | ~11m | ~37m | ~1h 49m |
-| **Real Data** | Yes | Yes | Yes | Yes | Yes | Simulated | Yes | Yes |
-| **Open Issues** | 1 | 2 | 1 | 3 | 5 | 7 | 6 | 4 |
+| **Duration** | ~23m | ~41m | ~2h 18m | ~11m | ~14m | ~1h 54m | ~37m | ~1h 49m |
+| **Real Data** | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| **Open Issues** | 1 | 2 | 1 | **0** | 3 | 5 | 6 | 4 |
 
 ---
 
@@ -226,13 +226,13 @@ due to slightly lower compliance (15/16 vs 16/16).
 | 2025-12-14-python-claude-beads-2 | 1 | 0 | 1 | Test Quality |
 | 2025-10-30-python-hive | 2 | 0 | 2 | Missing, Compliance |
 | 2025-12-15-python-claude-ruvector | 1 | 0 | 1 | Test Quality |
+| **2025-12-01-python-claude-beads** | **0** | **7** | 7 | ~~Missing, Docs, Compliance~~ All Fixed |
 | 2025-12-14-python-claude-beads | 3 | 0 | 3 | Missing, Compliance |
 | 2025-12-13-python-claude-swarm | 5 | 0 | 5 | Missing, Docs, Compliance |
-| 2025-12-01-python-claude-beads | 7 | 0 | 7 | Missing, Test Quality, Docs, Compliance |
 | 2025-12-13-python-claude-hive | 6 | 0 | 6 | Missing, Test Quality, Compliance |
 | 2025-09-30-python-swarm | 4 | 0 | 4 | Missing, Test Quality, Compliance |
 
-**Total Open Issues:** 29
+**Total Open Issues:** 22 (was 29, -7 closed)
 
 ### Issue Distribution by Type
 
