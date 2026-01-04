@@ -22,18 +22,18 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 | 5 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 1 open |
 | 6 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0 |
 | 7 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 1 open |
-| 8 | 2025-09-30-python-swarm | Swarm v1 | **54.2** | 14/16 | 15 | ✗ Skip | 5 open |
+| 8 | 2025-09-30-python-swarm | Swarm v1 | **72.7** | 16/16 | 39 | ✓ testcontainers | 1 open |
 
 See [results/LEADERBOARD.md](results/LEADERBOARD.md) for detailed analysis.
 
 ### Key Insights
 
 - **Best Overall:** Beads v3 (100% compliance, 59 effective tests)
-- **testcontainers leaders:** Hive v2 and Beads v2 have self-contained integration tests
+- **testcontainers leaders:** Hive v2, Beads v2, and Swarm v1 have self-contained integration tests
 - **Most Tests:** Hive v1 (64 effective BDD tests with 0% skip ratio)
-- **Full Compliance:** 6 attempts achieve 16/16 (Beads v3, RuVector, Swarm v2, Hive v2, Beads v2, Beads v1)
-- **Biggest Improvement:** Hive v2 (+29.5 points), Beads v2 (+9.8 points)
-- **6 of 8 fail integration:** Only Hive v2 and Beads v2 use testcontainers
+- **Full Compliance:** 7 attempts achieve 16/16 (all except Hive v1 at 15/16)
+- **Biggest Improvement:** Hive v2 (+29.5), Swarm v1 (+18.5), Swarm v2 (+17.0)
+- **5 of 8 fail integration:** 3 now use testcontainers (Hive v2, Beads v2, Swarm v1)
 
 ## Setup
 

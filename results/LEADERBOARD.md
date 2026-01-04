@@ -39,7 +39,7 @@ Where:
 | 5 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 3% | 1 open |
 | 6 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0% | 0 |
 | 7 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 0% | 1 open |
-| 8 | 2025-09-30-python-swarm | Swarm v1 | **54.2** | 14/16 | 15 | ✗ Skip | 0% | 5 open |
+| 8 | 2025-09-30-python-swarm | Swarm v1 | **72.7** | 16/16 | 39 | ✓ testcontainers | 0% | 1 open |
 
 ---
 
@@ -56,7 +56,7 @@ Where:
 | Hive v2 | 43 | 0 | **43** | None (testcontainers) | Excellent |
 | Beads v2 | 25 | 0 | **25** | None (testcontainers) | Excellent |
 | Beads v1 | 18 | 0 | **18** | None | Clean |
-| Swarm v1 | 15 | 0 | **15** | None | Clean |
+| Swarm v1 | 39 | 0 | **39** | None (testcontainers) | Excellent |
 
 ### Integration Test Quality (v4 Requirement)
 
@@ -69,10 +69,10 @@ Where:
 | Hive v2 | `testcontainers.Neo4jContainer` | ✓ Yes | ✓ Docker | 0 | #7 closed ✓ |
 | Beads v1 | `MockNeo4jDatabase` in-memory | ✗ No | ✗ Not persistent | -1.5 | #8 filed |
 | Beads v2 | `testcontainers.Neo4jContainer` | ✓ Yes | ✓ Docker | 0 | #4 closed ✓ |
-| Swarm v1 | Multiple `pytest.skip()` patterns | ✗ No | N/A | -1.5 | #5 filed |
+| Swarm v1 | `testcontainers.Neo4jContainer` | ✓ Yes | ✓ Docker | 0 | #5 closed ✓ |
 
-> **6 of 8 attempts fail** the self-contained integration test requirement.
-> **Hive v2 and Beads v2** are the only attempts using testcontainers for self-contained tests.
+> **5 of 8 attempts fail** the self-contained integration test requirement.
+> **Hive v2, Beads v2, and Swarm v1** now use testcontainers for self-contained tests.
 > Tests must use testcontainers with real persistent storage (Neo4j in Docker).
 > In-memory mocks like `MockNeo4jDatabase` do not provide persistence.
 
@@ -81,6 +81,7 @@ Where:
 | Attempt | Initial Score | Current Score | Change | Reason |
 |---------|---------------|---------------|--------|--------|
 | Hive v2 | 56.5 | **86.0** | +29.5 | 7 issues closed, testcontainers implemented, 0 skips |
+| Swarm v1 | 54.2 | **72.7** | +18.5 | 5 issues closed, testcontainers implemented, 16/16 compliance |
 | Swarm v2 | 65.8 | **82.8** | +17.0 | 5 issues closed, -1.5 integration penalty |
 | Beads v1 | 64.7 | **75.5** | +10.8 | 7 issues closed, -1.5 integration penalty (mock not persistent) |
 | Beads v2 | 68.6 | **78.4** | +9.8 | 4 issues closed, testcontainers implemented, 16/16 compliance |
@@ -98,7 +99,7 @@ Where:
 | Hive v2 | 50.00 | 19.35 | 13.50 | 3.12 | **86.0** |
 | Beads v1 | 50.00 | 8.10 | 13.50 | 3.91 | **75.5** |
 | Beads v2 | 50.00 | 11.25 | 13.50 | 3.60 | **78.4** |
-| Swarm v1 | 43.75 | 6.75 | 3.00 | 0.66 | **54.2** |
+| Swarm v1 | 50.00 | 17.55 | 4.50 | 0.66 | **72.7** |
 
 *Quality now includes -10 integration penalty for non-self-contained tests (×15% = -1.5 points)*
 
@@ -156,14 +157,14 @@ Total: 86.0  [was 56.5, +29.5 improvement]
 | Metric | Beads v3 | Hive v1 | RuVector | Swarm v2 | Hive v2 | Beads v1 | Beads v2 | Swarm v1 |
 |--------|----------|---------|----------|----------|---------|----------|----------|----------|
 | **Pattern** | Beads | Hive | Hive+RuVector | Swarm | Hive | Beads | Beads | Swarm |
-| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 14/16 |
-| **Effective Tests** | 59 | 64 | 61 | 37 | 43 | 18 | 25 | 15 |
+| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 |
+| **Effective Tests** | 59 | 64 | 61 | 37 | 43 | 18 | 25 | 39 |
 | **Skip Ratio** | 20% | 0% | 0% | ~3% | 0% | 0% | 0% | 0% |
 | **Lines of Code** | 4,947 | 3,545 | 8,751 | 5,546 | 3,754 | 2,194 | 2,793 | 8,683 |
 | **Fix Commits** | 0 | 1 | 1 | 0 | 1 | 0 | 1 | 7 |
 | **Duration** | ~23m | ~41m | ~2h 18m | ~1h 54m | ~41m | ~11m | ~14m | ~1h 49m |
 | **Real Data** | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Open Issues** | 2 | 3 | 1 | 1 | **0** | 1 | **0** | 5 |
+| **Open Issues** | 2 | 3 | 2 | 1 | **0** | 1 | **0** | 1 |
 
 ---
 
@@ -174,7 +175,7 @@ Total: 86.0  [was 56.5, +29.5 improvement]
 | **Hive** | 2 | 87.6 | 2nd | 50 | Strong pattern (v1: 92.4, v2: 82.7) |
 | **Beads** | 3 | 80.1 | 1st | 32 | Most consistent pattern |
 | **RuVector** | 1 | 91.6 | 3rd | 61 | Innovative architecture |
-| **Swarm** | 2 | 70.0 | 4th | 26 | Varied results (v1: 55.7, v2: 84.3) |
+| **Swarm** | 2 | 77.8 | 5th | 38 | Both now have testcontainers (v1: 72.7, v2: 82.8) |
 
 ---
 
@@ -262,9 +263,9 @@ due to slightly lower compliance (15/16 vs 16/16).
 | **2025-12-13-python-claude-hive** | **0** | **7** | 7 | ~~All Fixed~~ ✓ |
 | 2025-12-01-python-claude-beads | 1 | 7 | 8 | Test Quality (in-memory mock) |
 | **2025-12-14-python-claude-beads** | **0** | **4** | 4 | ~~All Fixed~~ ✓ |
-| 2025-09-30-python-swarm | 5 | 0 | 5 | Missing, Test Quality, Compliance |
+| 2025-09-30-python-swarm | 1 | 5 | 6 | Bug (e2e method signature) |
 
-**Total Open Issues:** 14
+**Total Open Issues:** 10
 
 ### Issue Distribution by Type
 

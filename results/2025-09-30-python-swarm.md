@@ -5,10 +5,25 @@
 | Metric | Value |
 |--------|-------|
 | **Pattern** | Swarm (Claude Flow) |
-| **Spec Compliance** | 14/16 requirements |
-| **Tests** | 15 passed, 0 failed (100%) |
+| **Spec Compliance** | 16/16 requirements |
+| **Tests** | 39 passed, 0 skipped (pytest-bdd) |
+| **Integration** | ✓ testcontainers (self-contained) |
 | **Autonomous Duration** | ~1h 49m |
 | **Documentation** | See `2025-09-30-python-swarm-summary/` |
+
+## Re-evaluation (2026-01-04)
+
+All 5 issues closed after fix commit:
+- ✓ #1: Player transfers relationship - implemented
+- ✓ #2: Coach manages relationship - implemented
+- ✓ #3: Compliance now 16/16 (was 14/16)
+- ✓ #4: pytest-bdd with Gherkin .feature files
+- ✓ #5: testcontainers for self-contained tests
+
+**Score Change: 54.2 → 72.7 (+18.5 points)**
+
+New issue filed:
+- #6: E2E tests have invalid method signature errors (2 test files fail to collect)
 
 ## Metrics
 
@@ -17,14 +32,15 @@
 | Lines of Code (src/) | 8,683 |
 | Python Files | 53 |
 | Dependencies | 32 |
-| Commits (Total) | 32 |
+| Commits (Total) | 33 |
 | Commits (Agent) | 10 |
 | Commits (Human) | 22 |
+| Commits (Fix-issues) | 1 |
 | Fix Commits | 7 |
-| Tests (Total) | 15 |
-| Tests (Passed) | 15 |
+| Tests (Total) | 39 |
+| Tests (Passed) | 39 |
 | **Tests (Skipped)** | **0** |
-| **Effective Tests** | **15** |
+| **Effective Tests** | **39** |
 | **Skip Ratio** | **0%** |
 
 ## Test Skip Analysis
@@ -91,13 +107,13 @@ These are proper integration test guards. When tests run with dependencies avail
 - [x] Stadium entity with properties (name, city, capacity)
 - [x] Coach entity with properties (name, nationality, birth_date)
 
-### Relationships (4/6)
+### Relationships (6/6)
 - [x] Player → PLAYS_FOR → Team
 - [x] Team → COMPETED_IN → Match
 - [x] Match → PART_OF → Competition
 - [x] Match → PLAYED_AT → Stadium
-- [ ] Player → TRANSFERRED_FROM/TO → Team (partial - model exists, not populated)
-- [ ] Coach → MANAGES → Team (partial - model exists, not populated)
+- [x] Player → TRANSFERRED_FROM/TO → Team ✓ Fixed in issue #1
+- [x] Coach → MANAGES → Team ✓ Fixed in issue #2
 
 ### MCP Tools (13/13 tested)
 - [x] search_player
@@ -140,14 +156,19 @@ Key design decisions:
 ## Test Results Summary
 
 ```
-Total Tests: 15
-Passed: 15 (100%)
+Total Tests: 39 (pytest-bdd with Gherkin .feature files)
+Passed: 39 (100%)
+Skipped: 0
 Failed: 0
 
-Performance:
-- Average: 0.019s
-- Fastest: 0.003s
-- Slowest: 0.038s
+Test Breakdown:
+- Match scenarios: 15 tests
+- Player scenarios: 10 tests
+- Team scenarios: 14 tests
+
+Integration: testcontainers with Neo4j 5.15.0
+
+Note: 2 e2e test files fail to collect due to method signature errors (issue #6)
 ```
 
 ## Data Coverage
