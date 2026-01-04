@@ -1,3 +1,4 @@
+
 # File Issues from Evaluation
 
 ## Overview
@@ -333,6 +334,145 @@ pytest-bdd step definitions and scenarios MUST be synchronous. Async functions w
 - Cause confusing "test passed" reports when tests didn't actually run
 
 Always use synchronous wrappers around async code in BDD tests.
+
+---
+
+#### 3e-swift. Swift/iOS Test Best Practices
+
+Check if tests follow Swift/iOS testing best practices:
+
+**Patterns to detect:**
+- Missing test targets in Xcode project
+- No XCTest usage
+- Empty test methods (stubs)
+- Disabled tests (renamed without `test` prefix)
+- Missing async test handling
+- No mock/dependency injection
+
+**Extraction:**
+```bash
+# Check for XCTest usage
+grep -r "import XCTest\|XCTestCase" ./reviews/{attempt_repo}/ --include="*.swift"
+
+# Check for test methods
+grep -r "func test" ./reviews/{attempt_repo}/ --include="*.swift" | wc -l
+
+# Check for disabled/stub tests
+grep -r "func disabled_\|// func test\|func _test" ./reviews/{attempt_repo}/ --include="*.swift"
+
+# Check for proper async testing
+grep -r "async throws\|expectation\|wait(for:" ./reviews/{attempt_repo}/ --include="*.swift"
+
+# Check for Quick/Nimble BDD framework
+grep -r "import Quick\|import Nimble\|describe.*context.*it" ./reviews/{attempt_repo}/ --include="*.swift"
+```
+
+**Issue Template (Swift):**
+```
+Title: [Test Quality] Use XCTest with proper async handling instead of {current_approach}
+Label: enhancement
+Body:
+## Issue
+{description of current test approach}
+
+## Current Approach
+{code example showing current pattern}
+
+## Best Practice
+Use XCTest with proper structure:
+
+```swift
+import XCTest
+@testable import YourApp
+
+final class FeatureTests: XCTestCase {
+    var sut: FeatureViewModel!
+    var mockService: MockNetworkService!
+
+    override func setUp() {
+        super.setUp()
+        mockService = MockNetworkService()
+        sut = FeatureViewModel(service: mockService)
+    }
+
+    override func tearDown() {
+        sut = nil
+        mockService = nil
+        super.tearDown()
+    }
+
+    func test_whenLoadingData_thenUpdatesState() async throws {
+        // Given
+        mockService.mockResult = TestData.sampleItems
+
+        // When
+        await sut.loadData()
+
+        // Then
+        XCTAssertEqual(sut.items.count, 3)
+        XCTAssertFalse(sut.isLoading)
+    }
+}
+```
+
+**For BDD-style tests, use Quick/Nimble:**
+
+```swift
+import Quick
+import Nimble
+@testable import YourApp
+
+class FeatureSpec: QuickSpec {
+    override class func spec() {
+        describe("Feature") {
+            var sut: FeatureViewModel!
+
+            beforeEach {
+                sut = FeatureViewModel()
+            }
+
+            context("when loading data") {
+                it("updates the state") {
+                    waitUntil { done in
+                        sut.loadData {
+                            expect(sut.items).toNot(beEmpty())
+                            done()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+## Recommendation
+{specific migration guidance}
+
+---
+Filed from evaluation: results/{attempt_repo}.md
+```
+
+**Swift Test Pattern Quality:**
+
+| Pattern | Quality | Action |
+|---------|---------|--------|
+| XCTest + async/await + DI | Best | No issue needed |
+| XCTest + expectations + DI | Good | No issue needed |
+| Quick/Nimble BDD | Good | No issue needed |
+| XCTest without DI | Acceptable | Optional improvement |
+| XCTest with stubs/disabled | Poor | File enhancement issue |
+| No tests | Critical | File bug issue |
+
+**Swift-Specific Test Issues:**
+
+| Issue | Detection | Severity |
+|-------|-----------|----------|
+| Tests don't compile | `swift build` fails | Critical |
+| Tests timeout on CI | Long `wait(for:)` calls | High |
+| No async handling | Missing `async` or `expectation` | Medium |
+| Force unwrapping in tests | `!` without guard | Low |
+| Missing mocks | No protocol-based DI | Medium |
 
 #### 3f. Documentation Quality
 Check if README.md contains essential user documentation:

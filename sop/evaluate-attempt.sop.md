@@ -2,13 +2,46 @@
 
 ## Overview
 This SOP evaluates a completed brazil-bench attempt against the spec.md requirements,
-capturing metrics for comparison across orchestration patterns.
+capturing metrics for comparison across orchestration patterns. Supports both Python
+and Swift/iOS implementations.
 
 ## Parameters
 - **attempt_repo** (required): Repository name (e.g., `attempt-3`)
 - **output_dir** (optional, default: `./results`): Where to write evaluation results
 
 ## Steps
+
+### 0. Detect Project Language
+Identify the primary language/platform of the implementation.
+
+**Detection Commands:**
+```bash
+cd ./reviews/{attempt_repo}
+
+# Python indicators
+ls pyproject.toml setup.py requirements.txt 2>/dev/null
+
+# Swift/iOS indicators
+ls Package.swift *.xcodeproj *.xcworkspace 2>/dev/null
+
+# Check file extensions
+find . -name "*.py" -not -path "./.venv/*" | head -5
+find . -name "*.swift" | head -5
+```
+
+**Language Detection Matrix:**
+
+| Files Found | Language | Test Framework |
+|-------------|----------|----------------|
+| `pyproject.toml`, `*.py` | Python | pytest |
+| `Package.swift`, `*.swift` | Swift Package | swift test |
+| `*.xcodeproj`, `*.swift` | iOS/Xcode | xcodebuild test |
+| Both Python and Swift | Multi-language | Run both |
+
+**Constraints:**
+- You MUST detect the language before running tests
+- You MUST use appropriate commands for the detected language
+- You SHOULD note the detected language in the report
 
 ### 1. Clone Attempt
 Fetch the attempt repository for local analysis.
@@ -42,6 +75,40 @@ Execute the test suite defined in the spec against the implementation.
 - You SHOULD timeout tests after 60 seconds each
 - You MAY retry flaky tests once
 - If tests fail due to missing dependencies, follow the dependency resolution steps below
+
+#### Python Test Commands
+```bash
+cd ./reviews/{attempt_repo}
+
+# Run pytest with verbose output
+pytest --tb=short -v 2>&1 | tee test_output.log
+
+# Get summary counts
+pytest --tb=no -q 2>&1 | tail -5
+```
+
+#### Swift/iOS Test Commands
+```bash
+cd ./reviews/{attempt_repo}
+
+# Swift Package Manager
+swift test 2>&1 | tee test_output.log
+
+# Xcode project (iOS Simulator)
+xcodebuild test \
+    -project *.xcodeproj \
+    -scheme "YourScheme" \
+    -destination 'platform=iOS Simulator,name=iPhone 15' \
+    2>&1 | tee test_output.log
+
+# Parse xcodebuild results
+grep -E "(Test Case|passed|failed)" test_output.log
+
+# Using xcpretty for cleaner output (if available)
+xcodebuild test -project *.xcodeproj -scheme "YourScheme" \
+    -destination 'platform=iOS Simulator,name=iPhone 15' \
+    | xcpretty --report junit
+```
 
 #### 3a. Handle Missing Dependencies (Neo4j, etc.)
 
@@ -107,6 +174,8 @@ If tests cannot be run directly, document:
 
 Skipped tests inflate test counts without providing actual verification. You MUST detect and report them separately.
 
+##### Python: Detect Skipped Tests
+
 **Step 1: Run pytest with verbose output to capture skipped tests**
 ```bash
 cd ./reviews/{attempt_repo}
@@ -132,6 +201,46 @@ grep -r "@pytest.mark.skip" tests/ --include="*.py" | wc -l
 # Count conditional skips (skipif)
 grep -r "@pytest.mark.skipif" tests/ --include="*.py" | wc -l
 ```
+
+##### Swift/iOS: Detect Skipped Tests
+
+**Step 1: Run swift test or xcodebuild and capture skipped tests**
+```bash
+cd ./reviews/{attempt_repo}
+
+# Swift Package Manager - look for skipped in output
+swift test 2>&1 | grep -E "(passed|failed|skipped)"
+
+# Xcode - parse test results
+xcodebuild test -project *.xcodeproj -scheme "YourScheme" \
+    -destination 'platform=iOS Simulator,name=iPhone 15' \
+    2>&1 | grep -E "Test Case.*passed|Test Case.*failed|skipped"
+```
+
+**Step 2: Analyze test files for skip patterns**
+```bash
+# Count XCTSkip usage (explicit skips)
+grep -r "XCTSkip\|throw XCTSkip" Tests/ --include="*.swift" | wc -l
+
+# Count disabled tests (func name doesn't start with test)
+grep -r "func disabled_test\|// func test" Tests/ --include="*.swift" | wc -l
+
+# Count tests with availability checks that skip
+grep -r "@available\|#available" Tests/ --include="*.swift" -A 2 | grep -i skip | wc -l
+
+# Look for conditional test execution
+grep -r "guard.*else.*return\|if.*XCTSkip" Tests/ --include="*.swift" | wc -l
+```
+
+**Swift Skip Patterns:**
+
+| Pattern | Type | Assessment |
+|---------|------|------------|
+| `throw XCTSkip("reason")` | Explicit skip | Acceptable if documented |
+| `#if !targetEnvironment(simulator)` | Conditional | Acceptable for device-only |
+| `@available(iOS 16, *)` | Version skip | Acceptable |
+| Renamed to `disabled_testFoo` | Hidden skip | Should be penalized |
+| Empty test body | Stub | Should be penalized |
 
 **Step 3: Calculate effective test count**
 
@@ -194,12 +303,41 @@ Collect quantitative data about the implementation.
 - You MUST capture: total lines of code, number of files, dependencies
 - You SHOULD capture: cyclomatic complexity, test coverage
 - You MAY capture: documentation coverage, type hint coverage
+
+#### Python Metrics
 ```bash
 # Lines of code (excluding tests)
 find ./reviews/{attempt_repo}/src -name "*.py" | xargs wc -l
 
 # Dependencies
 cat ./reviews/{attempt_repo}/pyproject.toml | grep dependencies -A 50
+
+# File count
+find ./reviews/{attempt_repo}/src -name "*.py" | wc -l
+```
+
+#### Swift/iOS Metrics
+```bash
+# Lines of code (excluding tests)
+find ./reviews/{attempt_repo}/Sources -name "*.swift" | xargs wc -l
+
+# For Xcode projects
+find ./reviews/{attempt_repo} -name "*.swift" -not -path "*/Tests/*" -not -path "*Test*" | xargs wc -l
+
+# Dependencies (Swift Package Manager)
+cat ./reviews/{attempt_repo}/Package.swift | grep -A 50 "dependencies:"
+
+# Dependencies (CocoaPods)
+cat ./reviews/{attempt_repo}/Podfile 2>/dev/null
+
+# Dependencies (Xcode project - SPM)
+grep -r "repositoryURL" ./reviews/{attempt_repo}/*.xcodeproj/project.pbxproj 2>/dev/null | head -20
+
+# File count
+find ./reviews/{attempt_repo}/Sources -name "*.swift" | wc -l
+
+# Check for SwiftLint configuration
+ls ./reviews/{attempt_repo}/.swiftlint.yml 2>/dev/null
 ```
 
 ### 5. Extract Git Metrics and Analyze Development Timeline
@@ -383,6 +521,49 @@ Determine whether the implementation uses real external data or simulated/mock d
   - Check if Match model has attendance field (schema compliance)
   - Note that field would be null with Kaggle data (data limitation)
   - This is NOT a failure - it's a data source constraint
+
+#### 6b. Documentation Quality Assessment
+
+Evaluate the README.md for essential user documentation.
+
+**Required Elements:**
+1. **Setup Instructions**: Prerequisites, installation steps, environment configuration
+2. **MCP Server Setup**: How to start the server, how to connect Claude
+3. **Example Q&A**: Sample questions and expected responses/output
+
+**Extraction Commands:**
+```bash
+# Check README content
+head -100 ./reviews/{attempt_repo}/README.md
+
+# Look for key documentation sections
+grep -E "Quick Start|Installation|Setup|MCP|Example|Usage" ./reviews/{attempt_repo}/README.md
+```
+
+**Documentation Quality Levels:**
+| Level | Criteria | In Report |
+|-------|----------|-----------|
+| Excellent | All 3 elements + extras (architecture, API ref, troubleshooting) | "Comprehensive README" |
+| Good | All 3 required elements present | "Good documentation" |
+| Acceptable | 2 of 3 elements | "Partial documentation" |
+| Poor | 0-1 elements | "Missing documentation" |
+
+**Best Practice Reference:**
+- `2025-10-30-python-hive`: Excellent (Quick Start, MCP config, 15+ demo questions, architecture, troubleshooting)
+- `2025-12-15-python-claude-ruvector`: Excellent (detailed setup, claude mcp add example, Q&A with output)
+
+**Include in Report:**
+```markdown
+## Documentation Quality
+
+| Element | Present | Notes |
+|---------|---------|-------|
+| Setup Instructions | Yes/No | {details} |
+| MCP Server Setup | Yes/No | {details} |
+| Example Q&A | Yes/No | {details} |
+
+**Assessment:** {Excellent/Good/Acceptable/Poor}
+```
 
 ### 7. Generate Codebase Documentation
 Generate comprehensive documentation for the implementation using the codebase-summary SOP.
