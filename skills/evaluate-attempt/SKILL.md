@@ -2,7 +2,7 @@
 name: evaluate-attempt
 description: This SOP evaluates a completed brazil-bench attempt against the spec.md requirements, capturing metrics for comparison across orchestration patterns. Supports Python and Swift/iOS projects.
 type: anthropic-skill
-version: "1.2"
+version: "1.3"
 ---
 
 # Evaluate Benchmark Attempt
@@ -262,12 +262,13 @@ grep -r "guard.*else.*return\|if.*XCTSkip" Tests/ --include="*.swift" | wc -l
 **Constraints for skipped test handling:**
 - You MUST report skipped tests separately from passed tests
 - You MUST calculate the "effective test count" (passed + failed, excluding skipped)
-- You MUST flag attempts with skip ratio > 20% as having "inflated test counts"
-- You SHOULD distinguish between:
-  - **Conditional skips** (`@pytest.mark.skipif`): Acceptable for environment-specific tests
-  - **Unconditional skips** (`pytest.skip()` in body): Should be penalized - tests never run
-  - **Decorator skips** (`@pytest.mark.skip`): Acceptable if documented
+- You MUST flag ANY skipped tests for issue filing - zero tolerance for skips
+- You MUST distinguish between skip types for the issue description:
+  - **Conditional skips** (`@pytest.mark.skipif`): Document reason in issue
+  - **Unconditional skips** (`pytest.skip()` in body): Critical - tests never run
+  - **Decorator skips** (`@pytest.mark.skip`): Document reason in issue
 - You MUST NOT count skipped tests toward the test score in rankings
+- You MUST file an issue for ANY skipped test (no acceptable skip threshold)
 
 **Example Analysis:**
 ```
@@ -340,9 +341,10 @@ grep -r "Docker\|Container\|TestServer" Tests/ --include="*.swift"
 | **testcontainers** | `Neo4jContainer()` in fixture | ✓ Best - automatic lifecycle |
 | **pytest-docker** | `docker_compose_file` fixture | ✓ Good - compose-based |
 | **conftest startup** | Fixture runs `docker run neo4j` | ✓ Acceptable - manual but works |
-| **In-memory mock** | `MockNeo4jClient` class | ✓ Acceptable for unit tests |
+| **In-memory mock** | `MockNeo4jClient` class | ✗ NOT acceptable - not persistent |
 | **External dependency** | `pytest.skip("Neo4j not running")` | ✗ NOT acceptable |
 | **CI-only tests** | `@pytest.mark.skipif(not CI)` | ✗ NOT acceptable |
+| **No integration tests** | No tests for data layer | ✗ NOT acceptable |
 
 **Example: testcontainers Pattern (Python)**
 
@@ -391,7 +393,7 @@ def neo4j_service(docker_services):
 | Integration Test Quality | Score Modifier |
 |-------------------------|----------------|
 | Self-contained (testcontainers/docker) | No penalty |
-| Self-contained (in-memory mock) | No penalty (unit tests) |
+| In-memory mock (not persistent) | -10 points quality |
 | Skips due to missing dependency | -10 points quality |
 | No integration tests at all | -15 points quality |
 

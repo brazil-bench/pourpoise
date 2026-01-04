@@ -2,7 +2,7 @@
 name: file-issues
 description: Parse evaluation reports and create GitHub issues on attempt repositories for each shortcoming, warning, or improvement opportunity identified during review. Supports Python and Swift/iOS projects.
 type: anthropic-skill
-version: "1.8"
+version: "1.9"
 ---
 
 # File Issues from Evaluation
@@ -177,11 +177,11 @@ Filed from evaluation: results/{attempt_repo}.md
 ```
 
 #### 3d. Skipped Tests
-Look for skip ratios above 10% in the "Metrics" or "Test Skip Analysis" sections:
+Look for ANY skipped tests in the "Metrics" or "Test Skip Analysis" sections:
 
 **Patterns to detect:**
-- Skip Ratio > 10% (benchmark penalty threshold)
-- Tests (Skipped) > 0
+- Tests (Skipped) > 0 (zero tolerance for skips)
+- Any Skip Ratio > 0%
 - Conditional skips for external dependencies
 
 **Extraction:**
@@ -228,10 +228,10 @@ Filed from evaluation: results/{attempt_repo}.md
 **Skip Ratio Thresholds:**
 | Skip Ratio | Assessment | Action |
 |------------|------------|--------|
-| 0-10% | Acceptable | No issue needed |
-| 10-30% | Notable | File issue, note if legitimate |
-| 30-50% | Concerning | File issue, recommend fixes |
-| 50%+ | Critical | File issue as `bug`, high priority |
+| 0% | Clean | No issue needed |
+| >0% | Not acceptable | File issue for every skipped test |
+| >20% | Concerning | File issue, recommend fixes |
+| >50% | Critical | File issue as `bug`, high priority |
 
 #### 3d-integration. Self-Contained Integration Tests (CRITICAL)
 
@@ -353,6 +353,109 @@ test = [
 Filed from evaluation: results/{attempt_repo}.md
 ```
 
+**Issue Template: Missing Integration Tests**
+```
+Title: [Test Quality] Missing integration tests - no tests verify data persistence
+Label: bug
+Body:
+## Issue
+
+No integration tests exist to verify the data persistence layer works correctly.
+
+## Current State
+
+- Only unit tests with mocks exist
+- No tests verify actual database operations
+- Data layer is untested in real conditions
+
+## Required
+
+Integration tests MUST exist and MUST:
+1. Use persistent storage (testcontainers, pytest-docker, or file-based)
+2. Test actual CRUD operations against real storage
+3. Run without manual setup (self-contained)
+
+## Recommended Solution
+
+Add integration tests using testcontainers:
+
+```python
+# tests/integration/conftest.py
+import pytest
+from testcontainers.neo4j import Neo4jContainer
+
+@pytest.fixture(scope="session")
+def neo4j_container():
+    with Neo4jContainer("neo4j:5") as neo4j:
+        yield neo4j
+
+# tests/integration/test_database.py
+def test_create_and_retrieve_match(neo4j_container):
+    client = Neo4jClient(uri=neo4j_container.get_connection_url())
+    match = client.create_match(...)
+    retrieved = client.get_match(match.id)
+    assert retrieved == match
+```
+
+## Impact
+
+- Current: Data layer has zero test coverage
+- After fix: Confidence that database operations work correctly
+
+---
+Filed from evaluation: results/{attempt_repo}.md
+```
+
+**Issue Template: In-Memory Mock Not Acceptable**
+```
+Title: [Test Quality] Integration tests use in-memory mock instead of persistent storage
+Label: bug
+Body:
+## Issue
+
+Integration tests use in-memory mock storage instead of persistent storage.
+
+## Current Behavior
+
+Tests use mock classes like `MockNeo4jDatabase` or `FakeStorage` that store data in memory dictionaries.
+
+## Why This Fails
+
+In-memory mocks:
+- Don't test actual persistence behavior
+- Don't catch serialization/deserialization bugs
+- Don't verify database constraints
+- Data doesn't survive process restart
+
+## Required Behavior
+
+Integration tests must use **persistent storage** that actually tests the data persistence layer.
+
+## Recommended Solution
+
+Use testcontainers with real database:
+
+```python
+from testcontainers.neo4j import Neo4jContainer
+
+@pytest.fixture(scope="session")
+def neo4j_container():
+    with Neo4jContainer("neo4j:5") as neo4j:
+        yield neo4j
+```
+
+Or use file-based persistent storage (e.g., SQLite):
+
+```python
+@pytest.fixture
+def db_path(tmp_path):
+    return tmp_path / "test.db"
+```
+
+---
+Filed from evaluation: results/{attempt_repo}.md
+```
+
 **Integration Test Quality Assessment:**
 
 | Pattern | Quality | Action |
@@ -360,10 +463,11 @@ Filed from evaluation: results/{attempt_repo}.md
 | testcontainers (auto-managed) | ✓ Best | No issue needed |
 | pytest-docker (compose-based) | ✓ Good | No issue needed |
 | conftest starts docker manually | ✓ Acceptable | No issue needed |
-| In-memory mock for unit tests | ✓ Acceptable | No issue needed |
+| In-memory mock (not persistent) | ✗ Not acceptable | File `bug` issue - storage must be persistent |
 | Skips if service not running | ✗ Not acceptable | File `bug` issue |
 | Requires manual docker setup | ✗ Not acceptable | File `bug` issue |
 | CI-only integration tests | ✗ Not acceptable | File `bug` issue |
+| No integration tests at all | ✗ Not acceptable | File `bug` issue |
 
 #### 3e. Test Best Practices
 Check if tests follow pytest-bdd best practices with Gherkin `.feature` files:

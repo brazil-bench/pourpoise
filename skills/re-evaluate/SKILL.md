@@ -2,7 +2,7 @@
 name: re-evaluate
 description: Re-evaluate attempt repositories after issues are closed, update evaluation reports, and file new issues for any regressions or newly discovered problems.
 type: anthropic-skill
-version: "1.1"
+version: "1.2"
 ---
 
 # Re-Evaluate Attempt After Changes
@@ -205,8 +205,14 @@ File a new issue using the template from file-issues SOP section 3d-integration:
 | Integration Test State | Score Modifier |
 |----------------------|----------------|
 | Self-contained (testcontainers/docker) | No penalty |
+| In-memory mock (not persistent) | -10 points quality |
 | Skips due to missing dependency | -10 points quality |
 | No integration tests | -15 points quality |
+
+**Skipped Test Policy:**
+- ANY skipped test requires an issue to be filed
+- Zero tolerance for skips - all tests must run and pass
+- File separate issue for each category of skip
 
 **Document in Report:**
 
