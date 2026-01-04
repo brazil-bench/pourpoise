@@ -1,3 +1,10 @@
+---
+name: evaluate-attempt
+description: This SOP evaluates a completed brazil-bench attempt against the spec.md requirements, capturing metrics for comparison across orchestration patterns. Supports Python and Swift/iOS projects.
+type: anthropic-skill
+version: "1.2"
+---
+
 # Evaluate Benchmark Attempt
 
 ## Overview
@@ -294,6 +301,120 @@ Flag: INFLATED TEST COUNT - 15 tests skip unconditionally
 ⚠️ **Warning:** 15 tests (25%) are skipped and never execute.
 These are integration tests that call `pytest.skip()` inside the test body.
 The effective test count for scoring is 44, not 59.
+```
+
+#### 3c. Self-Contained Integration Tests (REQUIRED)
+
+Integration tests MUST be self-contained and actually run. Tests that skip because "Neo4j not available" or similar are not acceptable.
+
+**Requirement:** Integration tests must start their own data stores as needed.
+
+**Detection Commands:**
+
+```bash
+cd ./reviews/{attempt_repo}
+
+# Check for testcontainers usage (Python)
+grep -r "testcontainers\|TestContainer\|DockerContainer" tests/ --include="*.py"
+
+# Check for docker-compose in test setup
+grep -r "docker-compose\|subprocess.*docker" tests/ --include="*.py"
+
+# Check for pytest-docker fixture
+grep -r "pytest-docker\|docker_compose" tests/ --include="*.py" pyproject.toml
+
+# Check for in-memory alternatives (e.g., SQLite instead of Postgres)
+grep -r "sqlite.*memory\|:memory:\|MockNeo4j\|FakeNeo4j" tests/ --include="*.py"
+
+# Check for conftest fixtures that start services
+grep -A 20 "@pytest.fixture" tests/conftest.py 2>/dev/null | grep -E "docker\|container\|start\|neo4j"
+
+# Swift: Check for test containers
+grep -r "Docker\|Container\|TestServer" Tests/ --include="*.swift"
+```
+
+**Acceptable Patterns for Self-Contained Tests:**
+
+| Pattern | Example | Assessment |
+|---------|---------|------------|
+| **testcontainers** | `Neo4jContainer()` in fixture | ✓ Best - automatic lifecycle |
+| **pytest-docker** | `docker_compose_file` fixture | ✓ Good - compose-based |
+| **conftest startup** | Fixture runs `docker run neo4j` | ✓ Acceptable - manual but works |
+| **In-memory mock** | `MockNeo4jClient` class | ✓ Acceptable for unit tests |
+| **External dependency** | `pytest.skip("Neo4j not running")` | ✗ NOT acceptable |
+| **CI-only tests** | `@pytest.mark.skipif(not CI)` | ✗ NOT acceptable |
+
+**Example: testcontainers Pattern (Python)**
+
+```python
+# conftest.py
+import pytest
+from testcontainers.neo4j import Neo4jContainer
+
+@pytest.fixture(scope="session")
+def neo4j_container():
+    """Start Neo4j container for integration tests."""
+    with Neo4jContainer("neo4j:5") as neo4j:
+        yield neo4j
+
+@pytest.fixture
+def neo4j_client(neo4j_container):
+    """Get client connected to test container."""
+    return Neo4jClient(
+        uri=neo4j_container.get_connection_url(),
+        auth=("neo4j", "password")
+    )
+```
+
+**Example: pytest-docker Pattern**
+
+```python
+# conftest.py
+import pytest
+
+@pytest.fixture(scope="session")
+def docker_compose_file():
+    return "docker-compose.test.yml"
+
+@pytest.fixture(scope="session")
+def neo4j_service(docker_services):
+    """Wait for Neo4j to be ready."""
+    docker_services.wait_until_responsive(
+        timeout=30.0,
+        pause=0.5,
+        check=lambda: is_neo4j_ready()
+    )
+```
+
+**Scoring Impact:**
+
+| Integration Test Quality | Score Modifier |
+|-------------------------|----------------|
+| Self-contained (testcontainers/docker) | No penalty |
+| Self-contained (in-memory mock) | No penalty (unit tests) |
+| Skips due to missing dependency | -10 points quality |
+| No integration tests at all | -15 points quality |
+
+**Constraints:**
+- You MUST check if integration tests are self-contained
+- You MUST flag tests that skip due to external dependencies
+- You MUST NOT accept "works on CI" as justification for skipping locally
+- You SHOULD recommend testcontainers or pytest-docker patterns
+- You SHOULD verify integration tests actually execute (not just exist)
+
+**Document in Report:**
+
+```markdown
+## Integration Test Quality
+
+| Aspect | Status |
+|--------|--------|
+| Self-contained | Yes/No |
+| Data store management | testcontainers / docker-compose / mock / external |
+| Integration tests run | X passed, Y skipped |
+
+⚠️ **Issue:** Integration tests skip when Neo4j is not running.
+Tests should use testcontainers or pytest-docker to manage dependencies.
 ```
 
 ### 4. Measure Code Metrics

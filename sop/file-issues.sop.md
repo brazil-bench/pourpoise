@@ -1,3 +1,9 @@
+---
+name: file-issues
+description: Parse evaluation reports and create GitHub issues on attempt repositories for each shortcoming, warning, or improvement opportunity identified during review. Supports Python and Swift/iOS projects.
+type: anthropic-skill
+version: "1.8"
+---
 
 # File Issues from Evaluation
 
@@ -226,6 +232,138 @@ Filed from evaluation: results/{attempt_repo}.md
 | 10-30% | Notable | File issue, note if legitimate |
 | 30-50% | Concerning | File issue, recommend fixes |
 | 50%+ | Critical | File issue as `bug`, high priority |
+
+#### 3d-integration. Self-Contained Integration Tests (CRITICAL)
+
+Integration tests that skip because external dependencies aren't running are NOT acceptable. Tests must manage their own data stores.
+
+**Patterns to detect:**
+- Tests skipping with "Neo4j not running", "database not available", etc.
+- Tests requiring manual docker setup before running
+- Tests that only pass in CI environments
+- Conditional skips based on external service availability
+
+**Extraction:**
+```bash
+# Check for external dependency skips
+grep -r "pytest.skip.*neo4j\|pytest.skip.*database\|pytest.skip.*not running" ./reviews/{attempt_repo}/tests/
+
+# Check for skipif based on service availability
+grep -r "skipif.*neo4j\|skipif.*database\|skipif.*connection" ./reviews/{attempt_repo}/tests/
+
+# Check for testcontainers usage (good)
+grep -r "testcontainers\|Neo4jContainer" ./reviews/{attempt_repo}/tests/
+
+# Check for pytest-docker usage (good)
+grep -r "pytest-docker\|docker_compose_file" ./reviews/{attempt_repo}/
+```
+
+**Issue Template:**
+```
+Title: [Test Quality] Integration tests must be self-contained - use testcontainers
+Label: bug
+Body:
+## Issue
+
+Integration tests skip when external dependencies (e.g., Neo4j) are not running. This is not acceptable - tests must manage their own data stores.
+
+## Current Behavior
+
+Tests skip with messages like:
+- "Neo4j not running"
+- "Database not available"
+- "Skipping integration tests"
+
+{examples from codebase}
+
+## Required Behavior
+
+Integration tests MUST start their own data stores. Tests should pass on any machine with Docker installed, without manual setup.
+
+## Recommended Solution: testcontainers
+
+Use [testcontainers-python](https://testcontainers-python.readthedocs.io/) to automatically manage Neo4j:
+
+```python
+# conftest.py
+import pytest
+from testcontainers.neo4j import Neo4jContainer
+
+@pytest.fixture(scope="session")
+def neo4j_container():
+    """Start Neo4j container for integration tests."""
+    with Neo4jContainer("neo4j:5") as neo4j:
+        yield neo4j
+
+@pytest.fixture
+def neo4j_client(neo4j_container):
+    """Get client connected to test container."""
+    return Neo4jClient(
+        uri=neo4j_container.get_connection_url(),
+        auth=("neo4j", "test")
+    )
+```
+
+```python
+# test_integration.py
+def test_create_match(neo4j_client):
+    """Test creating a match in Neo4j - container starts automatically."""
+    result = neo4j_client.create_match(...)
+    assert result is not None
+```
+
+## Alternative: pytest-docker
+
+If you prefer docker-compose, use [pytest-docker](https://github.com/avast/pytest-docker):
+
+```python
+# conftest.py
+@pytest.fixture(scope="session")
+def docker_compose_file():
+    return "docker-compose.test.yml"
+
+@pytest.fixture(scope="session")
+def neo4j_service(docker_services):
+    docker_services.wait_until_responsive(
+        timeout=30.0,
+        pause=0.5,
+        check=lambda: is_responsive()
+    )
+```
+
+## Dependencies to Add
+
+```toml
+# pyproject.toml
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "testcontainers[neo4j]",
+    # OR
+    "pytest-docker",
+]
+```
+
+## Impact
+
+- Current: Tests skip, providing no integration coverage
+- After fix: Tests run everywhere, actually verify Neo4j integration
+
+---
+Filed from evaluation: results/{attempt_repo}.md
+```
+
+**Integration Test Quality Assessment:**
+
+| Pattern | Quality | Action |
+|---------|---------|--------|
+| testcontainers (auto-managed) | ✓ Best | No issue needed |
+| pytest-docker (compose-based) | ✓ Good | No issue needed |
+| conftest starts docker manually | ✓ Acceptable | No issue needed |
+| In-memory mock for unit tests | ✓ Acceptable | No issue needed |
+| Skips if service not running | ✗ Not acceptable | File `bug` issue |
+| Requires manual docker setup | ✗ Not acceptable | File `bug` issue |
+| CI-only integration tests | ✗ Not acceptable | File `bug` issue |
 
 #### 3e. Test Best Practices
 Check if tests follow pytest-bdd best practices with Gherkin `.feature` files:
@@ -624,13 +762,14 @@ When creating the summary [Compliance] issue, reference related detail issues:
 | Missing requirement | `[Missing]` | `enhancement` |
 | Test quality issue | `[Test Quality]` | `bug` |
 | Skipped tests (>10%) | `[Test Quality]` | `enhancement` or `bug`* |
+| Integration tests skip | `[Test Quality]` | `bug` |
 | Test best practices | `[Test Quality]` | `enhancement` |
 | Documentation quality | `[Docs]` | `documentation` |
 | Spec compliance | `[Compliance]` | `enhancement` |
 | Architecture/quality | `[Quality]` | `enhancement` |
 | Performance concern | `[Performance]` | `enhancement` |
 
-*Use `bug` for skip ratios >50% or problematic skips; use `enhancement` for acceptable integration test skips.
+*Use `bug` for skip ratios >50%, problematic skips, or integration tests that skip due to missing dependencies; use `enhancement` for acceptable conditional skips.
 
 #### 4a. Summary Issue Template
 
