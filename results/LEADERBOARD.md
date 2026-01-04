@@ -28,9 +28,9 @@ Where:
 | 1 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **93.3** | 16/16 | 59 | 20% | ~23m | 1 open |
 | 2 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m | 2 open |
 | 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m | 0 |
-| 4 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
-| 5 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m | 3 open |
-| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | **65.8** | 10/16 | 37 | 3% | ~1h 54m | 5 open |
+| 4 | 2025-12-13-python-claude-swarm | Swarm v2 | **84.3** | 16/16 | 37 | 3% | ~1h 54m | 0 |
+| 5 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
+| 6 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m | 3 open |
 | 7 | 2025-12-13-python-claude-hive | Hive v2 | **56.5** | 13/16 | ~10 | **84%** | ~37m | 6 open |
 | 8 | 2025-09-30-python-swarm | Swarm v1 | **55.7** | 14/16 | 15 | 0% | ~1h 49m | 4 open |
 
@@ -75,9 +75,9 @@ Where:
 | Beads v3 | 50.00 | 26.55 | 14.25 | 2.53 | **93.3** |
 | Hive v1 | 46.88 | 28.80 | 13.50 | 3.23 | **92.4** |
 | RuVector | 50.00 | 27.45 | 13.50 | 0.63 | **91.6** |
+| **Swarm v2** | **50.00** | **16.65** | **15.00** | **2.23** | **84.3** |
+| Beads v1 | 50.00 | 8.10 | 15.00 | 3.91 | **77.0** |
 | Beads v2 | 43.75 | 8.10 | 15.00 | 3.24 | **70.1** |
-| Swarm v2 | 31.25 | 16.65 | 15.00 | 2.89 | **65.8** |
-| Beads v1 | 37.50 | 8.10 | 15.00 | 4.09 | **64.7** |
 | **Hive v2** | 40.63 | 4.50 | **9.45** | 1.92 | **56.5** |
 | Swarm v1 | 43.75 | 6.75 | 4.50 | 0.66 | **55.7** |
 
@@ -121,17 +121,17 @@ Efficiency: (100 - 61.65) × 5 = 1.92
 
 ## Detailed Metrics Comparison
 
-| Metric | Beads v3 | Hive v1 | RuVector | Beads v1 | Beads v2 | Swarm v2 | Hive v2 | Swarm v1 |
+| Metric | Beads v3 | Hive v1 | RuVector | Swarm v2 | Beads v1 | Beads v2 | Hive v2 | Swarm v1 |
 |--------|----------|---------|----------|----------|----------|----------|---------|----------|
-| **Pattern** | Beads | Hive | Hive+RuVector | Beads | Beads | Swarm | Hive | Swarm |
-| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 14/16 | 10/16 | 13/16 | 14/16 |
-| **Effective Tests** | 59 | 64 | 61 | 18 | 18 | ~37 | ~10 | 15 |
-| **Skip Ratio** | 20% | 0% | 0% | 0% | 0% | ~3% | **84%** | 0% |
-| **Lines of Code** | 4,947 | 3,545 | 8,751 | 2,194 | 3,511 | 4,227 | 6,165 | 8,683 |
+| **Pattern** | Beads | Hive | Hive+RuVector | Swarm | Beads | Beads | Hive | Swarm |
+| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 16/16 | 14/16 | 13/16 | 14/16 |
+| **Effective Tests** | 59 | 64 | 61 | 37 | 18 | 18 | ~10 | 15 |
+| **Skip Ratio** | 20% | 0% | 0% | ~3% | 0% | 0% | **84%** | 0% |
+| **Lines of Code** | 4,947 | 3,545 | 8,751 | 5,546 | 2,194 | 3,511 | 6,165 | 8,683 |
 | **Fix Commits** | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 7 |
-| **Duration** | ~23m | ~41m | ~2h 18m | ~11m | ~14m | ~1h 54m | ~37m | ~1h 49m |
+| **Duration** | ~23m | ~41m | ~2h 18m | ~1h 54m | ~11m | ~14m | ~37m | ~1h 49m |
 | **Real Data** | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Open Issues** | 1 | 2 | **0** | **0** | 3 | 5 | 6 | 4 |
+| **Open Issues** | 1 | 2 | **0** | **0** | **0** | 3 | 6 | 4 |
 
 ---
 
@@ -226,13 +226,13 @@ due to slightly lower compliance (15/16 vs 16/16).
 | 2025-12-14-python-claude-beads-2 | 1 | 0 | 1 | Test Quality |
 | 2025-10-30-python-hive | 2 | 0 | 2 | Missing, Compliance |
 | **2025-12-15-python-claude-ruvector** | **0** | **1** | 1 | ~~Test Quality~~ Fixed |
+| **2025-12-13-python-claude-swarm** | **0** | **5** | 5 | ~~Missing, Docs, Compliance~~ All Fixed |
 | **2025-12-01-python-claude-beads** | **0** | **7** | 7 | ~~Missing, Docs, Compliance~~ All Fixed |
 | 2025-12-14-python-claude-beads | 3 | 0 | 3 | Missing, Compliance |
-| 2025-12-13-python-claude-swarm | 5 | 0 | 5 | Missing, Docs, Compliance |
 | 2025-12-13-python-claude-hive | 6 | 0 | 6 | Missing, Test Quality, Compliance |
 | 2025-09-30-python-swarm | 4 | 0 | 4 | Missing, Test Quality, Compliance |
 
-**Total Open Issues:** 21 (was 29, -8 closed)
+**Total Open Issues:** 16 (was 29, -13 closed)
 
 ### Issue Distribution by Type
 

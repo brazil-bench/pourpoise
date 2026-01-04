@@ -18,9 +18,9 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 | 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **93.3** | 16/16 | 59 | 20% | ~23m | 1 open |
 | 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m | 2 open |
 | 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m | 0 |
-| 4 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
-| 5 | 2025-12-14-python-claude-beads | Beads v2 | 70.1 | 14/16 | 18 | 0% | ~14m | 3 open |
-| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | 65.8 | 10/16 | 37 | 3% | ~1h 54m | 5 open |
+| 4 | 2025-12-13-python-claude-swarm | Swarm v2 | **84.3** | 16/16 | 37 | 3% | ~1h 54m | 0 |
+| 5 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
+| 6 | 2025-12-14-python-claude-beads | Beads v2 | 70.1 | 14/16 | 18 | 0% | ~14m | 3 open |
 | 7 | 2025-12-13-python-claude-hive | Hive v2 | 56.5 | 13/16 | ~10 | **84%** | ~37m | 6 open |
 | 8 | 2025-09-30-python-swarm | Swarm v1 | 55.7 | 14/16 | 15 | 0% | ~1h 49m | 4 open |
 
