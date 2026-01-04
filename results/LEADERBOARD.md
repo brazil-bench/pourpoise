@@ -1,6 +1,6 @@
 # Brazil-Bench Leaderboard
 
-> Last updated: 2025-12-16
+> Last updated: 2025-01-04
 > Attempts evaluated: 8
 > Methodology: Effective Tests with Skip Penalty Scoring (v3)
 
@@ -29,9 +29,9 @@ Where:
 | 2 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m | 2 open |
 | 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m | 0 |
 | 4 | 2025-12-13-python-claude-swarm | Swarm v2 | **84.3** | 16/16 | 37 | 3% | ~1h 54m | 0 |
-| 5 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
-| 6 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m | 3 open |
-| 7 | 2025-12-13-python-claude-hive | Hive v2 | **56.5** | 13/16 | ~10 | **84%** | ~37m | 6 open |
+| 5 | 2025-12-13-python-claude-hive | Hive v2 | **82.7** | 16/16 | 36 | 12% | ~41m | 0 |
+| 6 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
+| 7 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m | 3 open |
 | 8 | 2025-09-30-python-swarm | Swarm v1 | **55.7** | 14/16 | 15 | 0% | ~1h 49m | 4 open |
 
 ---
@@ -45,26 +45,19 @@ Where:
 | Beads v3 | 74 | 15 | **59** | Integration (Neo4j) | Acceptable |
 | Hive v1 | 64 | 0 | **64** | None | Excellent |
 | RuVector | 61 | 0 | **61** | None | Excellent |
-| Beads v2 | 18 | 0 | **18** | None | Clean |
 | Swarm v2 | 38 | ~1 | **~37** | External dep | Clean |
+| Hive v2 | 41 | 5 | **36** | Integration (Neo4j) | Clean |
+| Beads v2 | 18 | 0 | **18** | None | Clean |
 | Beads v1 | 18 | 0 | **18** | None | Clean |
-| **Hive v2** | **63** | **53** | **~10** | **"Not implemented"** | **INFLATED** |
 | Swarm v1 | 15 | 0 | **15** | None | Clean |
 
-### Inflated Test Count Warning
+### Re-evaluation Score Changes
 
-> **2025-12-13-python-claude-hive (Hive v2)** has 53 of 63 tests (84%) that skip with
-> "not yet implemented" messages. This is NOT a legitimate integration test skip pattern.
->
-> Skip messages found:
-> - "DataLoader not yet implemented" (13 tests)
-> - "QueryEngine not yet implemented" (14 tests)
-> - "TeamNormalizer not yet implemented" (13 tests)
-> - Various "not yet implemented" (12 tests)
->
-> **Impact:** Score drops from ~85 to **56.5** due to:
-> - Skip penalty: (0.84 - 0.10) × 50 = **37 points** off quality
-> - Effective test count: **~10** instead of 63
+| Attempt | Initial Score | Current Score | Change | Reason |
+|---------|---------------|---------------|--------|--------|
+| Hive v2 | 56.5 | **82.7** | +26.2 | 6 issues closed: pytest-bdd, MCP tools, performance tests |
+| Swarm v2 | 65.8 | **84.3** | +18.5 | 5 issues closed: MCP tools, graph, compliance |
+| Beads v1 | 64.7 | **77.0** | +12.3 | 7 issues closed: MCP tools, docs, compliance |
 
 ---
 
@@ -75,10 +68,10 @@ Where:
 | Beads v3 | 50.00 | 26.55 | 14.25 | 2.53 | **93.3** |
 | Hive v1 | 46.88 | 28.80 | 13.50 | 3.23 | **92.4** |
 | RuVector | 50.00 | 27.45 | 13.50 | 0.63 | **91.6** |
-| **Swarm v2** | **50.00** | **16.65** | **15.00** | **2.23** | **84.3** |
+| Swarm v2 | 50.00 | 16.65 | 15.00 | 2.23 | **84.3** |
+| Hive v2 | 50.00 | 16.20 | 13.35 | 3.12 | **82.7** |
 | Beads v1 | 50.00 | 8.10 | 15.00 | 3.91 | **77.0** |
 | Beads v2 | 43.75 | 8.10 | 15.00 | 3.24 | **70.1** |
-| **Hive v2** | 40.63 | 4.50 | **9.45** | 1.92 | **56.5** |
 | Swarm v1 | 43.75 | 6.75 | 4.50 | 0.66 | **55.7** |
 
 ### Top 3 Detailed Scoring
@@ -107,31 +100,31 @@ Quality: (100 - 10 - 0) × 15 = 13.50  [10pt for 1 fix commit]
 Efficiency: (100 - 87.5) × 5 = 0.63
 ```
 
-### Why Hive v2 Ranks 7th
+### Hive v2 Score Improvement (Rank #7 → #5)
 
-**Despite 0 fix commits and fast completion:**
+**After 6 issues closed with pytest-bdd rewrite:**
 ```
-Compliance: 13/16 (81.25%) × 50 = 40.63
-Tests: min(100, 10×1.5)=15 × 30 = 4.50  [Only ~10 effective tests!]
-Quality: (100 - 0 - 37) × 15 = 9.45  [37pt penalty for 84% skip ratio]
-Efficiency: (100 - 61.65) × 5 = 1.92
+Compliance: 16/16 (100%) × 50 = 50.00  [was 13/16]
+Tests: min(100, 36×1.5)=54 × 30% = 16.20  [was ~10 effective]
+Quality: (100 - 10 - 1) × 15% = 13.35  [1 fix commit, 1pt skip penalty]
+Efficiency: (100 - 37.54) × 5% = 3.12
 ```
 
 ---
 
 ## Detailed Metrics Comparison
 
-| Metric | Beads v3 | Hive v1 | RuVector | Swarm v2 | Beads v1 | Beads v2 | Hive v2 | Swarm v1 |
-|--------|----------|---------|----------|----------|----------|----------|---------|----------|
-| **Pattern** | Beads | Hive | Hive+RuVector | Swarm | Beads | Beads | Hive | Swarm |
-| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 16/16 | 14/16 | 13/16 | 14/16 |
-| **Effective Tests** | 59 | 64 | 61 | 37 | 18 | 18 | ~10 | 15 |
-| **Skip Ratio** | 20% | 0% | 0% | ~3% | 0% | 0% | **84%** | 0% |
-| **Lines of Code** | 4,947 | 3,545 | 8,751 | 5,546 | 2,194 | 3,511 | 6,165 | 8,683 |
-| **Fix Commits** | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 7 |
-| **Duration** | ~23m | ~41m | ~2h 18m | ~1h 54m | ~11m | ~14m | ~37m | ~1h 49m |
+| Metric | Beads v3 | Hive v1 | RuVector | Swarm v2 | Hive v2 | Beads v1 | Beads v2 | Swarm v1 |
+|--------|----------|---------|----------|----------|---------|----------|----------|----------|
+| **Pattern** | Beads | Hive | Hive+RuVector | Swarm | Hive | Beads | Beads | Swarm |
+| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 16/16 | 16/16 | 14/16 | 14/16 |
+| **Effective Tests** | 59 | 64 | 61 | 37 | 36 | 18 | 18 | 15 |
+| **Skip Ratio** | 20% | 0% | 0% | ~3% | 12% | 0% | 0% | 0% |
+| **Lines of Code** | 4,947 | 3,545 | 8,751 | 5,546 | 3,754 | 2,194 | 3,511 | 8,683 |
+| **Fix Commits** | 0 | 1 | 1 | 0 | 1 | 0 | 0 | 7 |
+| **Duration** | ~23m | ~41m | ~2h 18m | ~1h 54m | ~41m | ~11m | ~14m | ~1h 49m |
 | **Real Data** | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Open Issues** | 1 | 2 | **0** | **0** | **0** | 3 | 6 | 4 |
+| **Open Issues** | 1 | 2 | **0** | **0** | **0** | **0** | 3 | 4 |
 
 ---
 
@@ -139,10 +132,10 @@ Efficiency: (100 - 61.65) × 5 = 1.92
 
 | Pattern | Attempts | Avg Score | Best Rank | Avg Effective Tests | Notes |
 |---------|----------|-----------|-----------|---------------------|-------|
-| **Beads** | 3 | 76.0 | 1st | 32 | Most consistent pattern |
-| **Hive** | 2 | 74.5 | 2nd | 37 | High variance (v1 excellent, v2 inflated) |
-| **Swarm** | 2 | 60.7 | 5th | 26 | Lower compliance, high fix counts |
+| **Hive** | 2 | 87.6 | 2nd | 50 | Strong pattern (v1: 92.4, v2: 82.7) |
+| **Beads** | 3 | 80.1 | 1st | 32 | Most consistent pattern |
 | **RuVector** | 1 | 91.6 | 3rd | 61 | Innovative architecture |
+| **Swarm** | 2 | 70.0 | 4th | 26 | Varied results (v1: 55.7, v2: 84.3) |
 
 ---
 
@@ -172,11 +165,11 @@ due to slightly lower compliance (15/16 vs 16/16).
 
 ### Pattern Insights
 
-- **Best pattern:** Beads (highest avg score: 76.0)
-- **Most efficient:** Beads v1 (lowest LOC: 1,826)
+- **Best pattern:** Hive (highest avg score: 87.6)
+- **Most efficient:** Beads v1 (lowest LOC: 2,194)
 - **Most tests:** Hive v1 (64 effective tests)
 - **Fastest:** Beads v1 (~11 min autonomous)
-- **Worst skip ratio:** Hive v2 (84% - tests never implemented)
+- **Best improvement:** Hive v2 (+26.2 points after issue fixes)
 
 ### Common Strengths (Top 3)
 - Full or near-full spec compliance
@@ -185,9 +178,9 @@ due to slightly lower compliance (15/16 vs 16/16).
 - Comprehensive BDD test coverage
 
 ### Areas for Improvement
-- **Hive v2:** Tests were created but functionality never implemented
+- ~~**Hive v2:** Tests were created but functionality never implemented~~ (Fixed: pytest-bdd rewrite)
 - **Swarm v1:** High fix commit count (7) indicates iteration issues
-- **Swarm v2:** Low compliance (10/16) despite adequate test count
+- **Beads v2:** Lower compliance (14/16) with 3 open issues
 
 ---
 
@@ -227,12 +220,12 @@ due to slightly lower compliance (15/16 vs 16/16).
 | 2025-10-30-python-hive | 2 | 0 | 2 | Missing, Compliance |
 | **2025-12-15-python-claude-ruvector** | **0** | **1** | 1 | ~~Test Quality~~ Fixed |
 | **2025-12-13-python-claude-swarm** | **0** | **5** | 5 | ~~Missing, Docs, Compliance~~ All Fixed |
+| **2025-12-13-python-claude-hive** | **0** | **6** | 6 | ~~Missing, Test Quality, Compliance~~ All Fixed |
 | **2025-12-01-python-claude-beads** | **0** | **7** | 7 | ~~Missing, Docs, Compliance~~ All Fixed |
 | 2025-12-14-python-claude-beads | 3 | 0 | 3 | Missing, Compliance |
-| 2025-12-13-python-claude-hive | 6 | 0 | 6 | Missing, Test Quality, Compliance |
 | 2025-09-30-python-swarm | 4 | 0 | 4 | Missing, Test Quality, Compliance |
 
-**Total Open Issues:** 16 (was 29, -13 closed)
+**Total Open Issues:** 10 (was 29, -19 closed)
 
 ### Issue Distribution by Type
 

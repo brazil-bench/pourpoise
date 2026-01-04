@@ -2,45 +2,43 @@
 
 ## Summary
 - **Pattern:** Hive Mind (Claude-Flow with Queen coordinator + 4 parallel agents)
-- **Spec Compliance:** 13/16 requirements
-- **Tests:** 63 test functions defined, but **53 skip unconditionally** (84% skip ratio)
-- **Effective Tests:** ~10 (tests that actually execute)
+- **Spec Compliance:** 16/16 requirements
+- **Tests:** 41 BDD scenarios (36 passed, 5 skipped for Neo4j)
+- **Effective Tests:** 36 (12% skip ratio)
 - **Autonomous Duration:** ~41 min
-- **Fix Commits:** 0 (but tests don't verify implementation)
+- **Fix Commits:** 0 (original) + 1 (post-evaluation)
 - **Documentation:** See `2025-12-13-python-claude-hive-summary/`
+- **Score:** **82.7** (was 56.5)
 
 ## Metrics
 | Metric | Value |
 |--------|-------|
-| Lines of Code | 6,165 |
-| Python Files | 18 |
-| Dependencies | 0 (stdlib only) |
-| Commits (Total) | 5 |
+| Lines of Code | 3,754 |
+| Python Files | 13 |
+| Dependencies | fastmcp, pytest-bdd |
+| Commits (Total) | 6 |
 | Commits (Agent) | 4 |
 | Commits (Human) | 1 (initial) |
-| Fix Commits | 0 |
-| Tests (Total) | 63 |
-| Tests (Passed) | ~10 |
-| **Tests (Skipped)** | **53** |
-| **Effective Tests** | **~10** |
-| **Skip Ratio** | **84%** |
+| Fix Commits | 1 (post-evaluation) |
+| Tests (Total) | 41 |
+| Tests (Passed) | 36 |
+| **Tests (Skipped)** | **5** |
+| **Effective Tests** | **36** |
+| **Skip Ratio** | **12%** |
+| MCP Tools | 7 |
 | Data Size | 11 MB |
 | Data Records | ~42,167 |
 
-## Test Quality Warning
+## Test Quality Note
 
-> **CRITICAL:** 53 of 63 tests (84%) contain `pytest.skip("not yet implemented")` statements.
-> These tests were written as stubs that never execute. They test functionality that was
-> never actually implemented. The "63 tests" figure is severely inflated.
+> **RESOLVED:** Tests have been rewritten using proper pytest-bdd with Gherkin `.feature` files.
+> The previous 84% skip rate issue has been fixed.
 
-**Skip Breakdown:**
-- `test_data_loader.py`: 13 tests skip with "DataLoader not yet implemented"
-- `test_query_engine.py`: 14 tests skip with "QueryEngine not yet implemented"
-- `test_team_normalizer.py`: 13 tests skip with "TeamNormalizer not yet implemented"
-- `test_integration.py`: 12 tests skip with various "not yet implemented" messages
-- `conftest.py`: 1 conditional skip for Neo4j availability
-
-**Implication:** The effective test count for scoring purposes is **~10**, not 63.
+**Current Test Status:**
+- 41 BDD scenarios across 5 feature files
+- 36 tests passed
+- 5 tests skipped (Neo4j integration - requires running database)
+- Skip ratio: 12% (acceptable for optional integration tests)
 
 ## Development Duration Breakdown
 
@@ -113,10 +111,10 @@ Total token usage: ~345k tokens across agents
 - [x] Neo4j knowledge graph schema (6 nodes, 8 relationships)
 - [x] Real Kaggle data included
 
-### Missing/Partial
-- [ ] MCP server implementation (tools not exposed as MCP endpoints)
-- [ ] Query performance benchmarks (< 2s simple, < 5s aggregate)
-- [ ] Cross-file queries verification
+### Previously Missing (Now Resolved)
+- [x] MCP server implementation (7 tools in `src/mcp_server.py`)
+- [x] Query performance benchmarks (tests in `features/performance.feature`)
+- [x] Cross-file queries verification (integrated in query engine)
 
 ## Architecture Summary
 
@@ -202,24 +200,25 @@ Tests cannot be run directly (requires Neo4j). Evidence from prompts.txt:
 
 | Metric | This Attempt | Hive Mind (Oct) | Swarm v2 | Beads |
 |--------|--------------|-----------------|----------|-------|
-| Duration | ~37 min | ~41 min | ~1h 54m | ~11 min |
-| LOC | 6,165 | 3,545 | 4,227 | 1,826 |
-| Tests | 63 | 64 BDD | 38 BDD | 18 BDD |
-| Compliance | 13/16 | 15/16 | 10/16 | 12/16 |
-| Fix Commits | 0 | 1 | 0 | 0 |
+| Duration | ~41 min | ~41 min | ~1h 54m | ~11 min |
+| LOC | 3,754 | 3,545 | 5,546 | 1,826 |
+| Tests | 41 BDD | 64 BDD | 38 BDD | 18 BDD |
+| Compliance | 16/16 | 15/16 | 16/16 | 12/16 |
+| Fix Commits | 1 | 1 | 0 | 0 |
 | Data | Real 11MB | Real 96MB | Real 11MB | Simulated |
 
 ## Strengths
-1. **Clean execution**: Zero fix commits, single implementation commit
+1. **Clean execution**: Single implementation commit with comprehensive fixes
 2. **Parallel agents**: 5 agents working concurrently with ~345k token throughput
-3. **Comprehensive testing**: 63 tests with BDD structure
+3. **Proper BDD testing**: 41 scenarios with Gherkin `.feature` files
 4. **Real data**: Complete Kaggle dataset included
 5. **Well-documented**: Context comments in all files
+6. **MCP server**: 7 tools properly exposed via FastMCP
 
 ## Weaknesses
-1. **No MCP tools**: Query engine exists but not exposed as MCP endpoints
-2. **No performance benchmarks**: Query timing not verified
-3. **Larger codebase**: More LOC than some patterns with similar features
+1. ~~**No MCP tools**~~: Now has 7 MCP tools via `src/mcp_server.py`
+2. ~~**No performance benchmarks**~~: Now has performance BDD tests
+3. **Larger codebase**: More LOC than some patterns with similar features (mitigated after cleanup)
 
 ## Notable Observations
 
@@ -232,6 +231,31 @@ The Hive Mind pattern with Claude-Flow demonstrated:
 
 ### Spec Deviation
 Uses `brazilian-soccer-mcp-guide.md` instead of `spec.md` - content appears equivalent to the standard benchmark spec.
+
+## Re-Evaluation History
+
+### Re-evaluation #1 (2025-01-04)
+**Trigger:** All 6 filed issues were closed with fixes.
+
+**Issues Resolved:**
+1. **Tests skipping unconditionally** - Tests rewritten with proper pytest-bdd and `.feature` files
+2. **MCP server not implemented** - Added `src/mcp_server.py` with 7 tools (450 lines)
+3. **Query performance benchmarks missing** - Added `features/performance.feature` with timing tests
+4. **Cross-file queries not verified** - Integrated cross-file query capabilities
+5. **Spec compliance at 81%** - Now 100% (16/16 requirements)
+6. **Use pytest-bdd with .feature files** - 5 new feature files created
+
+**Score Change:** 56.5 → 82.7 (+26.2)
+**Rank Change:** #7 → #5
+
+**New Files Added:**
+- `src/mcp_server.py` (450 lines, 7 MCP tools)
+- `features/data_loader.feature`
+- `features/query_engine.feature`
+- `features/team_normalizer.feature`
+- `features/performance.feature`
+- `features/integration.feature`
+- `tests/test_bdd_*.py` (pytest-bdd step implementations)
 
 ## Raw Data
 
