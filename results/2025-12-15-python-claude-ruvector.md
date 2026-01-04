@@ -237,3 +237,65 @@ Total span: 2h 18m 6s
 | Innovation | High | RuVector instead of Neo4j |
 
 **Overall Assessment**: Complete implementation with full spec compliance and innovative use of RuVector vector database. The longer duration is offset by comprehensive documentation, performance benchmarks, and a well-architected two-tier system (Python MCP + Node.js/Rust vector store).
+
+---
+
+## Re-Evaluation History
+
+### 2025-01-04 - Re-evaluation after test quality fix
+
+**Closed Issues Addressed:**
+- #1: [Test Quality] Use pytest-bdd with .feature files instead of custom BDD helper - **Verified Fixed**
+
+**Changes Made:**
+The test suite was migrated from a custom BDD helper class to standard pytest-bdd with Gherkin `.feature` files:
+
+**Before:**
+```python
+# Custom BDD helper class
+bdd.then("match should have required fields",
+         lambda: all(f in result for f in ['match_id', 'home_team']))
+```
+
+**After:**
+```gherkin
+# tests/features/gherkin/player_queries.feature
+Feature: Player Queries
+  Scenario: Search for Neymar
+    When I search for player "Neymar"
+    Then I should find players
+```
+
+**New Files Created:**
+- `tests/features/gherkin/match_queries.feature` (68 lines)
+- `tests/features/gherkin/player_queries.feature` (70 lines)
+- `tests/features/gherkin/statistics.feature` (63 lines)
+- `tests/features/gherkin/team_queries.feature` (60 lines)
+
+**Code Changes:**
+- +778 lines (new feature files + refactored step definitions)
+- -3,990 lines (removed old custom BDD implementation)
+- Net: -3,212 lines (cleaner, more maintainable)
+
+**Verification:**
+- All 61 tests still pass
+- No async step definitions (properly synchronous)
+- Proper Gherkin syntax in all feature files
+- pytest-bdd imports in all test modules
+
+**Updated Metrics:**
+
+| Metric | Previous | Current | Change |
+|--------|----------|---------|--------|
+| Test Framework | Custom BDD helper | pytest-bdd + Gherkin | Improved |
+| Feature Files | 0 | 4 | +4 |
+| LOC (tests) | 5,104 | ~2,000 | -3,100 |
+| Open Issues | 1 | 0 | -1 |
+
+**Score:** No change (91.6) - test count unchanged, but quality improved
+
+---
+
+*Initial evaluation: 2025-12-16*
+*Re-evaluation: 2025-01-04*
+*Repository: https://github.com/brazil-bench/2025-12-15-python-claude-ruvector*

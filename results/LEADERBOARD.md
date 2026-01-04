@@ -27,7 +27,7 @@ Where:
 |------|---------|---------|-------|------|-----------------|-------|----------|--------|
 | 1 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **93.3** | 16/16 | 59 | 20% | ~23m | 1 open |
 | 2 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m | 2 open |
-| 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m | 1 open |
+| 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m | 0 |
 | 4 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
 | 5 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m | 3 open |
 | 6 | 2025-12-13-python-claude-swarm | Swarm v2 | **65.8** | 10/16 | 37 | 3% | ~1h 54m | 5 open |
@@ -131,7 +131,7 @@ Efficiency: (100 - 61.65) × 5 = 1.92
 | **Fix Commits** | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 7 |
 | **Duration** | ~23m | ~41m | ~2h 18m | ~11m | ~14m | ~1h 54m | ~37m | ~1h 49m |
 | **Real Data** | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Open Issues** | 1 | 2 | 1 | **0** | 3 | 5 | 6 | 4 |
+| **Open Issues** | 1 | 2 | **0** | **0** | 3 | 5 | 6 | 4 |
 
 ---
 
@@ -225,14 +225,14 @@ due to slightly lower compliance (15/16 vs 16/16).
 |---------|------|--------|-------|------------|
 | 2025-12-14-python-claude-beads-2 | 1 | 0 | 1 | Test Quality |
 | 2025-10-30-python-hive | 2 | 0 | 2 | Missing, Compliance |
-| 2025-12-15-python-claude-ruvector | 1 | 0 | 1 | Test Quality |
+| **2025-12-15-python-claude-ruvector** | **0** | **1** | 1 | ~~Test Quality~~ Fixed |
 | **2025-12-01-python-claude-beads** | **0** | **7** | 7 | ~~Missing, Docs, Compliance~~ All Fixed |
 | 2025-12-14-python-claude-beads | 3 | 0 | 3 | Missing, Compliance |
 | 2025-12-13-python-claude-swarm | 5 | 0 | 5 | Missing, Docs, Compliance |
 | 2025-12-13-python-claude-hive | 6 | 0 | 6 | Missing, Test Quality, Compliance |
 | 2025-09-30-python-swarm | 4 | 0 | 4 | Missing, Test Quality, Compliance |
 
-**Total Open Issues:** 22 (was 29, -7 closed)
+**Total Open Issues:** 21 (was 29, -8 closed)
 
 ### Issue Distribution by Type
 
