@@ -9,7 +9,6 @@ improvement opportunity identified during the review.
 - **attempt_repo** (required): Repository name (e.g., `2025-12-13-python-claude-hive`)
 - **evaluation_path** (optional, default: `./results/{attempt_repo}.md`): Path to evaluation report
 - **dry_run** (optional, default: `false`): If true, show issues that would be created without creating them
-- **labels** (optional, default: `evaluation,automated`): Comma-separated labels to apply
 
 ## Steps
 
@@ -95,12 +94,6 @@ Look in the "Requirements Checklist" section for unchecked items:
 ```bash
 # Extract all missing requirements
 grep -E "^- \[ \]" ./results/{attempt_repo}.md
-```
-
-```markdown
-### Missing/Partial
-- [ ] MCP server implementation (tools not exposed as MCP endpoints)
-- [ ] Query performance benchmarks (< 2s simple, < 5s aggregate)
 ```
 
 **Issue Template:**
@@ -241,6 +234,7 @@ Check if tests follow pytest-bdd best practices with Gherkin `.feature` files:
 - Docstring-only BDD (not executable Gherkin)
 - Custom BDD helper classes instead of pytest-bdd
 - E2E-only tests without unit test coverage
+- **Async test functions** (pytest-bdd does not support async)
 
 **Extraction:**
 ```bash
@@ -249,6 +243,9 @@ grep -E "pytest-bdd|\.feature|Given.*When.*Then" ./results/{attempt_repo}.md
 
 # Check test approach in comparison analysis
 grep -A 5 "Test.*Framework\|BDD Style" ./results/{attempt_repo}.md
+
+# Check for async test functions (problematic with pytest-bdd)
+grep -r "async def test_\|async def given_\|async def when_\|async def then_" ./reviews/{attempt_repo}/tests/
 ```
 
 **Issue Template:**
@@ -263,7 +260,47 @@ Body:
 {code example showing current pattern}
 
 ## Best Practice
-Use pytest-bdd with proper Gherkin `.feature` files.
+Use pytest-bdd with proper Gherkin `.feature` files:
+
+```gherkin
+# features/example.feature
+Feature: Example Feature
+  Scenario: Example scenario
+    Given precondition
+    When action
+    Then expected result
+```
+
+**IMPORTANT: Use synchronous test functions only.**
+
+pytest-bdd does NOT support async step definitions or test functions. Async tests will silently fail or produce unexpected behavior.
+
+```python
+# WRONG - async tests fail with pytest-bdd
+@given("a database connection")
+async def given_db():  # ❌ Will not work correctly
+    return await get_connection()
+
+# CORRECT - use sync functions
+@given("a database connection")
+def given_db():  # ✓ Works correctly
+    return get_connection_sync()
+```
+
+If your MCP server uses async code, create synchronous test wrappers:
+
+```python
+import asyncio
+
+def run_async(coro):
+    """Helper to run async code in sync tests."""
+    return asyncio.get_event_loop().run_until_complete(coro)
+
+@given("a player search result")
+def given_player_search(context):
+    # Wrap async call in sync function
+    context["result"] = run_async(search_player("Neymar"))
+```
 
 ## Benefits of pytest-bdd
 1. Readable scenarios for non-technical stakeholders
@@ -281,11 +318,21 @@ Filed from evaluation: results/{attempt_repo}.md
 **Test Pattern Quality:**
 | Pattern | Quality | Action |
 |---------|---------|--------|
-| pytest-bdd + .feature files | Best | No issue needed |
-| pytest-bdd without .feature | Good | Optional improvement |
+| pytest-bdd + .feature files (sync) | Best | No issue needed |
+| pytest-bdd without .feature (sync) | Good | Optional improvement |
+| pytest-bdd with async functions | Broken | File bug issue - tests silently fail |
 | Docstring BDD | Acceptable | File enhancement issue |
 | Custom BDD helper | Non-standard | File enhancement issue |
 | E2E only / No BDD | Poor | File enhancement issue |
+
+**Critical: Async pytest-bdd Warning**
+
+pytest-bdd step definitions and scenarios MUST be synchronous. Async functions will:
+- Silently skip or fail tests
+- Return coroutine objects instead of results
+- Cause confusing "test passed" reports when tests didn't actually run
+
+Always use synchronous wrappers around async code in BDD tests.
 
 #### 3f. Documentation Quality
 Check if README.md contains essential user documentation:
@@ -313,9 +360,20 @@ Body:
 The README.md lacks essential user documentation.
 
 ## Missing Documentation
+
 ### 1. Setup Instructions
+- Prerequisites (Python version, Neo4j)
+- Installation steps
+- Environment configuration
+
 ### 2. MCP Server Setup
+- How to start the MCP server
+- How to configure Claude to use the server
+- Example configuration
+
 ### 3. Usage Examples with Q&A
+- Example questions users can ask
+- Expected responses/output
 
 ## Best Practice Example
 See `2025-10-30-python-hive` for comprehensive documentation.
@@ -327,9 +385,9 @@ Filed from evaluation: results/{attempt_repo}.md
 **Documentation Quality Levels:**
 | Level | Criteria | Action |
 |-------|----------|--------|
-| Excellent | All 3 elements + extras | No issue needed |
+| Excellent | All 3 elements + extras (architecture, API ref) | No issue needed |
 | Good | All 3 elements present | No issue needed |
-| Acceptable | 2 of 3 elements | Optional improvement |
+| Acceptable | 2 of 3 elements | Optional improvement issue |
 | Poor | 0-1 elements | File documentation issue |
 
 #### 3g. Architecture/Quality Issues
@@ -364,7 +422,7 @@ File each extracted shortcoming as a separate GitHub issue.
 
 **Constraints:**
 - You MUST create one issue per shortcoming (not a combined issue)
-- You MUST apply appropriate labels (after ensuring they exist in Step 2)
+- You MUST apply appropriate default labels
 - You MUST include reference to the evaluation report
 - You MUST check for duplicates before creating (match on title)
 - You MUST create detail issues BEFORE the summary issue (so you can reference issue numbers)
@@ -399,14 +457,6 @@ Add MCP server wrapper using `fastmcp` or `mcp` package.
 
 ---
 Filed from evaluation: [results/{attempt_repo}.md](https://github.com/brazil-bench/pourpoise/blob/main/results/{attempt_repo}.md)
-EOF
-)"
-
-# If labels don't exist, create without labels (they can be added later)
-gh issue create -R brazil-bench/{attempt_repo} \
-  --title "{issue_title}" \
-  --body "$(cat <<'EOF'
-{issue_body_markdown}
 EOF
 )"
 ```
@@ -514,45 +564,6 @@ Output a summary of all issues created.
 - Issues skipped (duplicates): {Z}
 ```
 
-## Output Format
-
-The SOP produces:
-1. GitHub issues on the attempt repository
-2. A summary markdown output showing all issues filed
-
-```markdown
-# Issue Filing Summary: {attempt_repo}
-
-## Repository
-brazil-bench/{attempt_repo}
-
-## Evaluation Report
-results/{attempt_repo}.md
-
-## Issues Created
-
-### Missing Requirements ({count})
-| Issue | Title | URL |
-|-------|-------|-----|
-| #1 | [Missing] MCP server implementation | https://... |
-
-### Test Quality ({count})
-| Issue | Title | URL |
-|-------|-------|-----|
-| #2 | [Test Quality] 84% skip ratio | https://... |
-
-### Compliance ({count})
-...
-
-### Quality ({count})
-...
-
-## Statistics
-- Total issues created: {N}
-- Skipped (duplicates): {M}
-- Evaluation score: {score}
-```
-
 ## Examples
 
 ### Example 1: Filing issues for Hive v2
@@ -574,13 +585,6 @@ Expected issues:
 ```bash
 # Preview issues without creating them
 file issues for 2025-12-13-python-claude-hive --dry-run
-```
-
-### Example 3: Filing with custom labels
-
-```bash
-# Add custom labels
-file issues for 2025-12-14-python-claude-beads-2 --labels "evaluation,v3-methodology,needs-review"
 ```
 
 ## Troubleshooting

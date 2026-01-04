@@ -2,7 +2,7 @@
 name: file-issues
 description: Parse evaluation reports and create GitHub issues on attempt repositories for each shortcoming, warning, or improvement opportunity identified during review.
 type: anthropic-skill
-version: "1.5"
+version: "1.6"
 ---
 
 # File Issues from Evaluation
@@ -241,6 +241,7 @@ Check if tests follow pytest-bdd best practices with Gherkin `.feature` files:
 - Docstring-only BDD (not executable Gherkin)
 - Custom BDD helper classes instead of pytest-bdd
 - E2E-only tests without unit test coverage
+- **Async test functions** (pytest-bdd does not support async)
 
 **Extraction:**
 ```bash
@@ -249,6 +250,9 @@ grep -E "pytest-bdd|\.feature|Given.*When.*Then" ./results/{attempt_repo}.md
 
 # Check test approach in comparison analysis
 grep -A 5 "Test.*Framework\|BDD Style" ./results/{attempt_repo}.md
+
+# Check for async test functions (problematic with pytest-bdd)
+grep -r "async def test_\|async def given_\|async def when_\|async def then_" ./reviews/{attempt_repo}/tests/
 ```
 
 **Issue Template:**
@@ -274,6 +278,37 @@ Feature: Example Feature
     Then expected result
 ```
 
+**IMPORTANT: Use synchronous test functions only.**
+
+pytest-bdd does NOT support async step definitions or test functions. Async tests will silently fail or produce unexpected behavior.
+
+```python
+# WRONG - async tests fail with pytest-bdd
+@given("a database connection")
+async def given_db():  # ❌ Will not work correctly
+    return await get_connection()
+
+# CORRECT - use sync functions
+@given("a database connection")
+def given_db():  # ✓ Works correctly
+    return get_connection_sync()
+```
+
+If your MCP server uses async code, create synchronous test wrappers:
+
+```python
+import asyncio
+
+def run_async(coro):
+    """Helper to run async code in sync tests."""
+    return asyncio.get_event_loop().run_until_complete(coro)
+
+@given("a player search result")
+def given_player_search(context):
+    # Wrap async call in sync function
+    context["result"] = run_async(search_player("Neymar"))
+```
+
 ## Benefits of pytest-bdd
 1. Readable scenarios for non-technical stakeholders
 2. Reusable step definitions
@@ -290,11 +325,21 @@ Filed from evaluation: results/{attempt_repo}.md
 **Test Pattern Quality:**
 | Pattern | Quality | Action |
 |---------|---------|--------|
-| pytest-bdd + .feature files | Best | No issue needed |
-| pytest-bdd without .feature | Good | Optional improvement |
+| pytest-bdd + .feature files (sync) | Best | No issue needed |
+| pytest-bdd without .feature (sync) | Good | Optional improvement |
+| pytest-bdd with async functions | Broken | File bug issue - tests silently fail |
 | Docstring BDD | Acceptable | File enhancement issue |
 | Custom BDD helper | Non-standard | File enhancement issue |
 | E2E only / No BDD | Poor | File enhancement issue |
+
+**Critical: Async pytest-bdd Warning**
+
+pytest-bdd step definitions and scenarios MUST be synchronous. Async functions will:
+- Silently skip or fail tests
+- Return coroutine objects instead of results
+- Cause confusing "test passed" reports when tests didn't actually run
+
+Always use synchronous wrappers around async code in BDD tests.
 
 #### 3f. Documentation Quality
 Check if README.md contains essential user documentation:
