@@ -2,7 +2,7 @@
 
 > Last updated: 2025-01-04
 > Attempts evaluated: 8
-> Methodology: Effective Tests with Skip Penalty Scoring (v3)
+> Methodology: Effective Tests with Skip Penalty + Integration Test Quality (v4)
 
 ## Scoring Methodology
 
@@ -12,27 +12,34 @@ Score = (Spec Compliance % × 50) + (Test Score × 30) + (Quality × 15) + (Effi
 Where:
 - Spec Compliance % = (implemented / total) × 100
 - Test Score = min(100, EFFECTIVE_TESTS × 1.5)  [Uses effective tests, not total]
-- Quality = 100 - (fix_commits × 10) - skip_penalty
+- Quality = 100 - (fix_commits × 10) - skip_penalty - integration_penalty
 - Skip Penalty = max(0, (skip_ratio - 0.10) × 50)  [Penalizes >10% skipped tests]
+- Integration Penalty = 10 if tests skip due to missing dependencies, 0 if self-contained
 - Efficiency = 100 - min(100, LOC / 100)
 ```
 
-**Priority Order:** Compliance > Effective Tests > Quality > Skip Ratio > Duration
+**Priority Order:** Compliance > Effective Tests > Quality > Integration Tests > Duration
+
+**Integration Test Requirement (v4):**
+- Tests must be self-contained using testcontainers or pytest-docker
+- Tests that skip with "Neo4j not running" receive -10 quality penalty
+- **In-memory mocks are NOT acceptable** - storage must be persistent
+- testcontainers with real Neo4j in Docker is the recommended approach
 
 ---
 
 ## Top 10 Leaderboard
 
-| Rank | Attempt | Pattern | Score | Spec | Effective Tests | Skip% | Duration | Issues |
-|------|---------|---------|-------|------|-----------------|-------|----------|--------|
-| 1 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **93.3** | 16/16 | 59 | 20% | ~23m | 1 open |
-| 2 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m | 2 open |
-| 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m | 0 |
-| 4 | 2025-12-13-python-claude-swarm | Swarm v2 | **84.3** | 16/16 | 37 | 3% | ~1h 54m | 0 |
-| 5 | 2025-12-13-python-claude-hive | Hive v2 | **82.7** | 16/16 | 36 | 12% | ~41m | 0 |
-| 6 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
-| 7 | 2025-12-14-python-claude-beads | Beads v2 | **70.1** | 14/16 | 18 | 0% | ~14m | 3 open |
-| 8 | 2025-09-30-python-swarm | Swarm v1 | **55.7** | 14/16 | 15 | 0% | ~1h 49m | 4 open |
+| Rank | Attempt | Pattern | Score | Spec | Tests | Integration | Skip% | Issues |
+|------|---------|---------|-------|------|-------|-------------|-------|--------|
+| 1 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **91.8** | 16/16 | 59 | ✗ External | 20% | 2 open |
+| 2 🥈 | 2025-10-30-python-hive | Hive v1 | **90.9** | 15/16 | 64 | ✗ External | 0% | 3 open |
+| 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 0% | 1 open |
+| 4 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 3% | 1 open |
+| 5 | 2025-12-13-python-claude-hive | Hive v2 | **81.2** | 16/16 | 36 | ✗ Skip | 12% | 1 open |
+| 6 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 0% | 1 open |
+| 7 | 2025-12-14-python-claude-beads | Beads v2 | **68.6** | 14/16 | 18 | ✗ External | 0% | 4 open |
+| 8 | 2025-09-30-python-swarm | Swarm v1 | **54.2** | 14/16 | 15 | ✗ Skip | 0% | 5 open |
 
 ---
 
@@ -51,13 +58,30 @@ Where:
 | Beads v1 | 18 | 0 | **18** | None | Clean |
 | Swarm v1 | 15 | 0 | **15** | None | Clean |
 
+### Integration Test Quality (v4 Requirement)
+
+| Attempt | Pattern | Self-Contained | Persistent | Penalty | Issue |
+|---------|---------|----------------|------------|---------|-------|
+| Beads v3 | `pytest.skip("requires Neo4j")` | ✗ No | N/A | -1.5 | #2 filed |
+| Hive v1 | External `localhost:7687` | ✗ No | ✗ External | -1.5 | #3 filed |
+| RuVector | `pytest.skip("RuVector not available")` | ✗ No | N/A | -1.5 | #2 filed |
+| Swarm v2 | `pytest.skip("Neo4j connection failed")` | ✗ No | N/A | -1.5 | #6 filed |
+| Hive v2 | `pytest.skip("Neo4j not available")` | ✗ No | N/A | -1.5 | #7 filed |
+| Beads v1 | `MockNeo4jDatabase` in-memory | ✗ No | ✗ Not persistent | -1.5 | #8 filed |
+| Beads v2 | External `localhost:7687` | ✗ No | ✗ External | -1.5 | #4 filed |
+| Swarm v1 | Multiple `pytest.skip()` patterns | ✗ No | N/A | -1.5 | #5 filed |
+
+> **ALL 8 attempts fail** the self-contained integration test requirement.
+> Tests must use testcontainers with real persistent storage (Neo4j in Docker).
+> In-memory mocks like `MockNeo4jDatabase` do not provide persistence.
+
 ### Re-evaluation Score Changes
 
 | Attempt | Initial Score | Current Score | Change | Reason |
 |---------|---------------|---------------|--------|--------|
-| Hive v2 | 56.5 | **82.7** | +26.2 | 6 issues closed: pytest-bdd, MCP tools, performance tests |
-| Swarm v2 | 65.8 | **84.3** | +18.5 | 5 issues closed: MCP tools, graph, compliance |
-| Beads v1 | 64.7 | **77.0** | +12.3 | 7 issues closed: MCP tools, docs, compliance |
+| Hive v2 | 56.5 | **81.2** | +24.7 | 6 issues closed, -1.5 integration penalty |
+| Swarm v2 | 65.8 | **82.8** | +17.0 | 5 issues closed, -1.5 integration penalty |
+| Beads v1 | 64.7 | **75.5** | +10.8 | 7 issues closed, -1.5 integration penalty (mock not persistent) |
 
 ---
 
@@ -65,39 +89,49 @@ Where:
 
 | Attempt | Compliance (50%) | Tests (30%) | Quality (15%) | Efficiency (5%) | **Total** |
 |---------|------------------|-------------|---------------|-----------------|-----------|
-| Beads v3 | 50.00 | 26.55 | 14.25 | 2.53 | **93.3** |
-| Hive v1 | 46.88 | 28.80 | 13.50 | 3.23 | **92.4** |
-| RuVector | 50.00 | 27.45 | 13.50 | 0.63 | **91.6** |
-| Swarm v2 | 50.00 | 16.65 | 15.00 | 2.23 | **84.3** |
-| Hive v2 | 50.00 | 16.20 | 13.35 | 3.12 | **82.7** |
-| Beads v1 | 50.00 | 8.10 | 15.00 | 3.91 | **77.0** |
-| Beads v2 | 43.75 | 8.10 | 15.00 | 3.24 | **70.1** |
-| Swarm v1 | 43.75 | 6.75 | 4.50 | 0.66 | **55.7** |
+| Beads v3 | 50.00 | 26.55 | 12.75 | 2.53 | **91.8** |
+| Hive v1 | 46.88 | 28.80 | 12.00 | 3.23 | **90.9** |
+| RuVector | 50.00 | 27.45 | 12.00 | 0.63 | **90.1** |
+| Swarm v2 | 50.00 | 16.65 | 13.50 | 2.23 | **82.8** |
+| Hive v2 | 50.00 | 16.20 | 11.85 | 3.12 | **81.2** |
+| Beads v1 | 50.00 | 8.10 | 13.50 | 3.91 | **75.5** |
+| Beads v2 | 43.75 | 8.10 | 13.50 | 3.24 | **68.6** |
+| Swarm v1 | 43.75 | 6.75 | 3.00 | 0.66 | **54.2** |
+
+*Quality now includes -10 integration penalty for non-self-contained tests (×15% = -1.5 points)*
 
 ### Top 3 Detailed Scoring
 
-**1st Place: Beads v3 (93.3)**
+**1st Place: Beads v3 (91.8)**
 ```
 Compliance: 16/16 (100%) × 50 = 50.00
-Tests: min(100, 59×1.5)=88.5 × 30 = 26.55
-Quality: (100 - 0 - 5) × 15 = 14.25  [5pt skip penalty for 20%]
-Efficiency: (100 - 49.5) × 5 = 2.53
+Tests: min(100, 59×1.5)=88.5 × 30% = 26.55
+Quality: (100 - 0 - 5 - 10) × 15% = 12.75  [5pt skip, 10pt integration]
+Efficiency: (100 - 49.5) × 5% = 2.53
 ```
 
-**2nd Place: Hive v1 (92.4)**
+**2nd Place: Hive v1 (90.9)**
 ```
 Compliance: 15/16 (93.75%) × 50 = 46.88
-Tests: min(100, 64×1.5)=96 × 30 = 28.80
-Quality: (100 - 10 - 0) × 15 = 13.50  [10pt for 1 fix commit]
-Efficiency: (100 - 35.5) × 5 = 3.23
+Tests: min(100, 64×1.5)=96 × 30% = 28.80
+Quality: (100 - 10 - 0 - 10) × 15% = 12.00  [10pt fix, 10pt integration]
+Efficiency: (100 - 35.5) × 5% = 3.23
 ```
 
-**3rd Place: RuVector (91.6)**
+**3rd Place: RuVector (90.1)**
 ```
 Compliance: 16/16 (100%) × 50 = 50.00
-Tests: min(100, 61×1.5)=91.5 × 30 = 27.45
-Quality: (100 - 10 - 0) × 15 = 13.50  [10pt for 1 fix commit]
-Efficiency: (100 - 87.5) × 5 = 0.63
+Tests: min(100, 61×1.5)=91.5 × 30% = 27.45
+Quality: (100 - 10 - 0 - 10) × 15% = 12.00  [10pt fix, 10pt integration]
+Efficiency: (100 - 87.5) × 5% = 0.63
+```
+
+**6th Place: Beads v1 (75.5)**
+```
+Compliance: 16/16 (100%) × 50 = 50.00
+Tests: min(100, 18×1.5)=27 × 30% = 8.10
+Quality: (100 - 0 - 0 - 10) × 15% = 13.50  [10pt integration - MockNeo4jDatabase not persistent]
+Efficiency: (100 - 21.9) × 5% = 3.91
 ```
 
 ### Hive v2 Score Improvement (Rank #7 → #5)

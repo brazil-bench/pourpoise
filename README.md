@@ -11,30 +11,29 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 ## Current Leaderboard
 
 > 8 attempts evaluated as of 2025-01-04
-> Methodology: Effective Tests with Skip Penalty (v3)
+> Methodology: Effective Tests with Skip Penalty + Integration Test Quality (v4)
 
-| Rank | Attempt | Pattern | Score | Compliance | Effective Tests | Skip% | Duration | Issues |
-|------|---------|---------|-------|------------|-----------------|-------|----------|--------|
-| 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **93.3** | 16/16 | 59 | 20% | ~23m | 1 open |
-| 🥈 | 2025-10-30-python-hive | Hive v1 | **92.4** | 15/16 | 64 | 0% | ~41m | 2 open |
-| 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **91.6** | 16/16 | 61 | 0% | ~2h 18m | 0 |
-| 4 | 2025-12-13-python-claude-swarm | Swarm v2 | **84.3** | 16/16 | 37 | 3% | ~1h 54m | 0 |
-| 5 | 2025-12-13-python-claude-hive | Hive v2 | **82.7** | 16/16 | 36 | 12% | ~41m | 0 |
-| 6 | 2025-12-01-python-claude-beads | Beads v1 | **77.0** | 16/16 | 18 | 0% | ~11m | 0 |
-| 7 | 2025-12-14-python-claude-beads | Beads v2 | 70.1 | 14/16 | 18 | 0% | ~14m | 3 open |
-| 8 | 2025-09-30-python-swarm | Swarm v1 | 55.7 | 14/16 | 15 | 0% | ~1h 49m | 4 open |
+| Rank | Attempt | Pattern | Score | Compliance | Tests | Integration | Issues |
+|------|---------|---------|-------|------------|-------|-------------|--------|
+| 🥇 | 2025-12-14-python-claude-beads-2 | Beads v3 | **91.8** | 16/16 | 59 | ✗ External | 2 open |
+| 🥈 | 2025-10-30-python-hive | Hive v1 | **90.9** | 15/16 | 64 | ✗ External | 3 open |
+| 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 1 open |
+| 4 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 1 open |
+| 5 | 2025-12-13-python-claude-hive | Hive v2 | **81.2** | 16/16 | 36 | ✗ Skip | 1 open |
+| 6 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 1 open |
+| 7 | 2025-12-14-python-claude-beads | Beads v2 | **68.6** | 14/16 | 18 | ✗ External | 4 open |
+| 8 | 2025-09-30-python-swarm | Swarm v1 | **54.2** | 14/16 | 15 | ✗ Skip | 5 open |
 
 See [results/LEADERBOARD.md](results/LEADERBOARD.md) for detailed analysis.
 
 ### Key Insights
 
-- **Best Overall:** Beads v3 (100% compliance, 59 effective tests, 0 fix commits)
+- **Best Overall:** Beads v3 (100% compliance, 59 effective tests)
 - **Most Tests:** Hive v1 (64 effective BDD tests with 0% skip ratio)
-- **Full Compliance:** Beads v3, RuVector, Swarm v2, Hive v2, and Beads v1 all achieve 16/16
-- **Fastest:** Beads v1 (~11 min autonomous)
-- **Zero Issues:** 4 attempts now have all issues closed (RuVector, Swarm v2, Hive v2, Beads v1)
-- **Best Improvement:** Hive v2 gained +26.2 points after pytest-bdd rewrite
-- **Innovation:** RuVector uses vector DB instead of Neo4j
+- **Full Compliance:** 5 attempts achieve 16/16 (Beads v3, RuVector, Swarm v2, Hive v2, Beads v1)
+- **New Requirement (v4):** Integration tests must use persistent storage (testcontainers or pytest-docker)
+- **8 Issues Filed:** ALL attempts need self-contained integration tests with persistent storage
+- **Mock Storage Not Acceptable:** In-memory mocks like `MockNeo4jDatabase` are not persistent
 
 ## Setup
 
