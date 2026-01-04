@@ -263,7 +263,7 @@ due to slightly lower compliance (15/16 vs 16/16).
 | **2025-12-13-python-claude-hive** | **0** | **7** | 7 | ~~All Fixed~~ ✓ |
 | 2025-12-01-python-claude-beads | 1 | 7 | 8 | Test Quality (in-memory mock) |
 | **2025-12-14-python-claude-beads** | **0** | **4** | 4 | ~~All Fixed~~ ✓ |
-| 2025-09-30-python-swarm | 1 | 5 | 6 | Bug (e2e method signature) |
+| 2025-09-30-python-swarm | 1 | 6 | 7 | Bug (Neo4j auth in e2e) |
 
 **Total Open Issues:** 10
 
