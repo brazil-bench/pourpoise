@@ -2,7 +2,7 @@
 name: compare-attempts
 description: This SOP compares evaluated brazil-bench attempts across multiple dimensions to produce a ranked leaderboard and detailed comparison summary. It supports up to 10 attempts in the "Top 10" format, automatically pruning lower-ranked entries when more are added.
 type: anthropic-skill
-version: "1.0"
+version: "1.1"
 ---
 
 # Compare Benchmark Attempts
@@ -42,6 +42,7 @@ Parse each evaluation report to extract comparable metrics.
 - You MUST extract git metrics (commits, duration, fix commits)
 - You SHOULD normalize duration to hours for comparison
 - You MUST handle missing metrics gracefully (mark as "N/A")
+- You MUST check for evaluation methodology differences (see Step 2a)
 
 **Required Metrics:**
 | Metric | Source | Notes |
@@ -57,6 +58,60 @@ Parse each evaluation report to extract comparable metrics.
 | Test Scenarios | Test Summary | BDD or unit test count |
 | Token Usage | Token Usage section | From prompts.txt if available |
 | Phase Durations | Duration Breakdown | Initial coding, tests working, human intervention |
+
+### 2a. Check for Evaluation Methodology Differences
+
+Compare how each attempt was evaluated to ensure fair comparison.
+
+**Constraints:**
+- You MUST verify all attempts use the same requirement denominator (should be 16)
+- You MUST flag attempts evaluated with different methodologies
+- You MUST document any normalization applied to make scores comparable
+- You SHOULD recommend re-evaluation for attempts with non-standard methodology
+
+**Detection Commands:**
+```bash
+# Check spec compliance denominators across all evaluations
+grep -h "Spec Compliance" {results_dir}/*.md | grep -v LEADERBOARD
+
+# Look for different requirement counts
+grep -E "requirements|/16|/12|/15" {results_dir}/*.md
+```
+
+**Canonical Requirements (16 total):**
+All evaluations should use this breakdown:
+- Functional Requirements: 6 (FR-1 through FR-6)
+- Query Performance: 3 (QP-1 through QP-3)
+- Data Coverage: 3 (DC-1 through DC-3)
+- Technical Requirements: 4 (TR-1 through TR-4)
+
+**Methodology Difference Table:**
+
+| Attempt | Denominator | Categories Evaluated | Difference | Action |
+|---------|-------------|---------------------|------------|--------|
+| {name} | /16 | All 4 categories | None | OK |
+| {name} | /12 | Missing TR-* | -4 requirements | Flag for re-eval |
+| {name} | /10 | Custom | Non-standard | Flag for re-eval |
+
+**Include in Report:**
+```markdown
+## Evaluation Methodology Check
+
+⚠️ **Inconsistency Detected:** The following attempts were evaluated with different requirement counts:
+
+| Attempt | Evaluated As | Expected | Difference |
+|---------|--------------|----------|------------|
+| gastown | 12/12 | 16/16 | Missing TR-1 through TR-4 |
+
+These attempts should be re-evaluated using the canonical 16-requirement checklist.
+Until re-evaluated, their compliance scores are normalized: 12/12 → 12/16 (75%).
+```
+
+**Normalization Rules:**
+- If an attempt shows X/Y where Y ≠ 16, normalize to X/16
+- Example: 12/12 becomes 12/16 (not 16/16)
+- Flag in leaderboard with asterisk: "12/16*"
+- Add footnote explaining the normalization
 
 ### 3. Calculate Ranking Score
 Compute a composite score for ranking attempts.
@@ -235,6 +290,22 @@ Output the final comparison document.
 > Last updated: {timestamp}
 > Attempts evaluated: {count}
 
+## Evaluation Methodology Check
+
+{If all attempts use 16/16 denominator:}
+✅ All attempts evaluated using canonical 16-requirement checklist.
+
+{If inconsistencies found:}
+⚠️ **Inconsistency Detected:** The following attempts were evaluated with different requirement counts:
+
+| Attempt | Evaluated As | Normalized To | Missing Requirements |
+|---------|--------------|---------------|---------------------|
+| {name} | {X/Y} | {X/16} | {list of missing req IDs} |
+
+*Scores marked with asterisk (*) have been normalized. Re-evaluation recommended.*
+
+---
+
 ## 🏆 Top 10 Leaderboard
 
 | Rank | Attempt | Pattern | Score | Spec | LOC | Tests | Duration | Issues |
@@ -243,6 +314,8 @@ Output the final comparison document.
 | 2 🥈 | {name} | {pattern} | {score} | {X/Y} | {loc} | {tests} | {duration} | {n} open |
 | 3 🥉 | {name} | {pattern} | {score} | {X/Y} | {loc} | {tests} | {duration} | {n} open |
 | 4 | ... | ... | ... | ... | ... | ... | ... | ... |
+
+*Spec column: X/16 expected. Entries with asterisk (*) were normalized from different denominators.*
 
 ## Initial Prompts
 

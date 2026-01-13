@@ -36,7 +36,7 @@ Where:
 | 2 🥈 | 2025-10-30-python-hive | Hive v1 | **90.9** | 15/16 | 64 | ✗ External | 0% | 3 open |
 | 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 0% | 2 open |
 | 4 | 2025-12-13-python-claude-hive | Hive v2 | **86.0** | 16/16 | 43 | ✓ testcontainers | 0% | 0 |
-| 5 | 2026-01-13-python-gastown | Gastown | **85.4** | 12/12 | 40 | ✗ External | 0% | 1 open |
+| 5 | 2026-01-13-python-gastown | Gastown | **85.4** | 16/16 | 40 | ✗ External | 0% | 1 open |
 | 6 | 2025-09-30-python-swarm | Swarm v1 | **83.5** | 16/16 | 63 | ✓ testcontainers | 0% | 0 |
 | 7 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 3% | 1 open |
 | 8 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0% | 0 |
@@ -156,7 +156,7 @@ Total: 86.0  [was 56.5, +29.5 improvement]
 
 ### 5th Place: Gastown (85.4)
 ```
-Compliance: 12/12 (100%) × 50 = 50.00
+Compliance: 16/16 (100%) × 50 = 50.00
 Tests: min(100, 40×1.5)=60 × 30% = 18.00
 Quality: (100 - 0 - 0 - 10) × 15% = 13.50  [0pt fix, 0pt skip, 10pt integration]
 Efficiency: (100 - 23.05) × 5% = 3.85
@@ -171,7 +171,7 @@ Efficiency: (100 - 23.05) × 5% = 3.85
 | Metric | Beads v3 | Hive v1 | RuVector | Hive v2 | Gastown | Swarm v1 | Swarm v2 | Beads v2 | Beads v1 |
 |--------|----------|---------|----------|---------|---------|----------|----------|----------|----------|
 | **Pattern** | Beads | Hive | Hive+RuVector | Hive | Gastown | Swarm | Swarm | Beads | Beads |
-| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 12/12 | 16/16 | 16/16 | 16/16 | 16/16 |
+| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 |
 | **Effective Tests** | 59 | 64 | 61 | 43 | 40 | 63 | 37 | 25 | 18 |
 | **Skip Ratio** | 20% | 0% | 0% | 0% | 0% | 0% | ~3% | 0% | 0% |
 | **Lines of Code** | 4,947 | 3,545 | 8,751 | 3,754 | 2,305 | 8,683 | 5,546 | 2,793 | 2,194 |

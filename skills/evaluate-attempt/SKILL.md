@@ -2,7 +2,7 @@
 name: evaluate-attempt
 description: This SOP evaluates a completed brazil-bench attempt against the spec.md requirements, capturing metrics for comparison across orchestration patterns. Supports Python and Swift/iOS projects.
 type: anthropic-skill
-version: "1.4"
+version: "1.5"
 ---
 
 # Evaluate Benchmark Attempt
@@ -716,10 +716,65 @@ Include a Development Timeline section in the report:
 Review implementation completeness against spec.md requirements.
 
 **Constraints:**
-- You MUST enumerate each requirement in spec.md
+- You MUST evaluate against ALL 16 canonical requirements listed below
 - You MUST assess each as: implemented, partial, missing
 - You SHOULD note implementation approach for each
 - You MUST NOT make subjective quality judgments beyond spec compliance
+- You MUST use the exact requirement numbering for cross-attempt consistency
+
+#### 6.0 Canonical Requirements Checklist (16 Requirements)
+
+All evaluations MUST use this exact checklist to ensure consistency across attempts.
+
+**Functional Requirements (6):**
+1. **[FR-1]** Search and return match data from all CSV files
+2. **[FR-2]** Search and return player data
+3. **[FR-3]** Calculate basic statistics (wins, losses, goals)
+4. **[FR-4]** Compare teams head-to-head
+5. **[FR-5]** Handle team name variations correctly
+6. **[FR-6]** Return properly formatted responses
+
+**Query Performance (3):**
+7. **[QP-1]** Simple lookups respond in < 2 seconds
+8. **[QP-2]** Aggregate queries respond in < 5 seconds
+9. **[QP-3]** No timeout errors
+
+**Data Coverage (3):**
+10. **[DC-1]** All 6 CSV files are loadable and queryable
+11. **[DC-2]** At least 20 sample questions can be answered
+12. **[DC-3]** Cross-file queries work (player + match data)
+
+**Technical Requirements (4):**
+13. **[TR-1]** MCP server implementation with callable tools
+14. **[TR-2]** BDD testing with Given-When-Then structure
+15. **[TR-3]** UTF-8 encoding support (Portuguese characters: ã, ç, é, etc.)
+16. **[TR-4]** Multiple date format handling (ISO, Brazilian DD/MM/YYYY, with time)
+
+**Report Format for Requirements:**
+```markdown
+## Requirements Checklist
+
+### Functional Requirements (X/6)
+- [x] [FR-1] Search and return match data from all CSV files
+- [x] [FR-2] Search and return player data
+- [ ] [FR-3] Calculate basic statistics (partial: missing draws)
+...
+
+### Query Performance (X/3)
+- [x] [QP-1] Simple lookups respond in < 2 seconds
+...
+
+### Data Coverage (X/3)
+- [x] [DC-1] All 6 CSV files are loadable and queryable
+...
+
+### Technical Requirements (X/4)
+- [x] [TR-1] MCP server implementation with callable tools
+- [x] [TR-2] BDD testing with Given-When-Then structure
+...
+
+**Total: X/16 requirements implemented**
+```
 
 #### 6a. Real Data vs Simulated Data Assessment
 
