@@ -10,7 +10,7 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 
 ## Current Leaderboard
 
-> 8 attempts evaluated as of 2025-01-04
+> 9 attempts evaluated as of 2026-01-13
 > Methodology: Effective Tests with Skip Penalty + Integration Test Quality (v4)
 
 | Rank | Attempt | Pattern | Score | Compliance | Tests | Integration | Issues |
@@ -19,21 +19,23 @@ A secondary purpose is to explore and develop mechanisms that automate the devel
 | 🥈 | 2025-10-30-python-hive | Hive v1 | **90.9** | 15/16 | 64 | ✗ External | 3 open |
 | 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 2 open |
 | 4 | 2025-12-13-python-claude-hive | Hive v2 | **86.0** | 16/16 | 43 | ✓ testcontainers | 0 |
-| 5 | 2025-09-30-python-swarm | Swarm v1 | **83.5** | 16/16 | 63 | ✓ testcontainers | 0 |
-| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 1 open |
-| 7 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0 |
-| 8 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 1 open |
+| 5 | 2026-01-13-python-gastown | Gastown | **85.4** | 12/12 | 40 | ✗ External | 1 open |
+| 6 | 2025-09-30-python-swarm | Swarm v1 | **83.5** | 16/16 | 63 | ✓ testcontainers | 0 |
+| 7 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 1 open |
+| 8 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0 |
+| 9 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 1 open |
 
 See [results/LEADERBOARD.md](results/LEADERBOARD.md) for detailed analysis.
 
 ### Key Insights
 
 - **Best Overall:** Beads v3 (100% compliance, 59 effective tests)
+- **New Entry:** Gastown (#5) - fastest implementation (~18 min), zero fix commits
 - **testcontainers leaders:** Hive v2, Beads v2, and Swarm v1 have self-contained integration tests
 - **Most Tests:** Hive v1 (64), Swarm v1 (63) - both with 0% skip ratio
-- **Full Compliance:** 7 attempts achieve 16/16 (all except Hive v1 at 15/16)
-- **Biggest Improvement:** Hive v2 (+29.5), Swarm v1 (+29.3), Swarm v2 (+17.0)
-- **5 of 8 fail integration:** 3 now use testcontainers (Hive v2, Beads v2, Swarm v1)
+- **Full Compliance:** 8 attempts achieve 100% (Hive v1 at 15/16)
+- **Cleanest Code:** Gastown (0 fix commits, 40 tests pass first try)
+- **6 of 9 fail integration:** 3 use testcontainers (Hive v2, Beads v2, Swarm v1)
 
 ## Setup
 

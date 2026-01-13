@@ -1,7 +1,7 @@
 # Brazil-Bench Leaderboard
 
-> Last updated: 2025-01-04
-> Attempts evaluated: 8
+> Last updated: 2026-01-13
+> Attempts evaluated: 9
 > Methodology: Effective Tests with Skip Penalty + Integration Test Quality (v4)
 
 ## Scoring Methodology
@@ -36,10 +36,11 @@ Where:
 | 2 🥈 | 2025-10-30-python-hive | Hive v1 | **90.9** | 15/16 | 64 | ✗ External | 0% | 3 open |
 | 3 🥉 | 2025-12-15-python-claude-ruvector | RuVector | **90.1** | 16/16 | 61 | ✗ External | 0% | 2 open |
 | 4 | 2025-12-13-python-claude-hive | Hive v2 | **86.0** | 16/16 | 43 | ✓ testcontainers | 0% | 0 |
-| 5 | 2025-09-30-python-swarm | Swarm v1 | **83.5** | 16/16 | 63 | ✓ testcontainers | 0% | 0 |
-| 6 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 3% | 1 open |
-| 7 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0% | 0 |
-| 8 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 0% | 1 open |
+| 5 | 2026-01-13-python-gastown | Gastown | **85.4** | 12/12 | 40 | ✗ External | 0% | 1 open |
+| 6 | 2025-09-30-python-swarm | Swarm v1 | **83.5** | 16/16 | 63 | ✓ testcontainers | 0% | 0 |
+| 7 | 2025-12-13-python-claude-swarm | Swarm v2 | **82.8** | 16/16 | 37 | ✗ Skip | 3% | 1 open |
+| 8 | 2025-12-14-python-claude-beads | Beads v2 | **78.4** | 16/16 | 25 | ✓ testcontainers | 0% | 0 |
+| 9 | 2025-12-01-python-claude-beads | Beads v1 | **75.5** | 16/16 | 18 | ✗ Mock | 0% | 1 open |
 
 ---
 
@@ -52,6 +53,7 @@ Where:
 | Beads v3 | 74 | 15 | **59** | Integration (Neo4j) | Acceptable |
 | Hive v1 | 64 | 0 | **64** | None | Excellent |
 | RuVector | 61 | 0 | **61** | None | Excellent |
+| Gastown | 40 | 0 | **40** | None | Excellent |
 | Swarm v2 | 38 | ~1 | **~37** | External dep | Clean |
 | Hive v2 | 43 | 0 | **43** | None (testcontainers) | Excellent |
 | Beads v2 | 25 | 0 | **25** | None (testcontainers) | Excellent |
@@ -65,13 +67,14 @@ Where:
 | Beads v3 | `pytest.skip("requires Neo4j")` | ✗ No | N/A | -1.5 | #2 filed |
 | Hive v1 | External `localhost:7687` | ✗ No | ✗ External | -1.5 | #3 filed |
 | RuVector | `pytest.skip("RuVector not available")` | ✗ No | N/A | -1.5 | #2 filed |
+| Gastown | External `localhost:7687` | ✗ No | ✗ External | -1.5 | #1 filed |
 | Swarm v2 | `pytest.skip("Neo4j connection failed")` | ✗ No | N/A | -1.5 | #6 filed |
 | Hive v2 | `testcontainers.Neo4jContainer` | ✓ Yes | ✓ Docker | 0 | #7 closed ✓ |
 | Beads v1 | `MockNeo4jDatabase` in-memory | ✗ No | ✗ Not persistent | -1.5 | #8 filed |
 | Beads v2 | `testcontainers.Neo4jContainer` | ✓ Yes | ✓ Docker | 0 | #4 closed ✓ |
 | Swarm v1 | `testcontainers.Neo4jContainer` | ✓ Yes | ✓ Docker | 0 | #5 closed ✓ |
 
-> **5 of 8 attempts fail** the self-contained integration test requirement.
+> **6 of 9 attempts fail** the self-contained integration test requirement.
 > **Hive v2, Beads v2, and Swarm v1** now use testcontainers for self-contained tests.
 > Tests must use testcontainers with real persistent storage (Neo4j in Docker).
 > In-memory mocks like `MockNeo4jDatabase` do not provide persistence.
@@ -95,11 +98,12 @@ Where:
 | Beads v3 | 50.00 | 26.55 | 12.75 | 2.53 | **91.8** |
 | Hive v1 | 46.88 | 28.80 | 12.00 | 3.23 | **90.9** |
 | RuVector | 50.00 | 27.45 | 12.00 | 0.63 | **90.1** |
-| Swarm v2 | 50.00 | 16.65 | 13.50 | 2.23 | **82.8** |
 | Hive v2 | 50.00 | 19.35 | 13.50 | 3.12 | **86.0** |
-| Beads v1 | 50.00 | 8.10 | 13.50 | 3.91 | **75.5** |
-| Beads v2 | 50.00 | 11.25 | 13.50 | 3.60 | **78.4** |
+| Gastown | 50.00 | 18.00 | 13.50 | 3.85 | **85.4** |
 | Swarm v1 | 50.00 | 28.35 | 4.50 | 0.66 | **83.5** |
+| Swarm v2 | 50.00 | 16.65 | 13.50 | 2.23 | **82.8** |
+| Beads v2 | 50.00 | 11.25 | 13.50 | 3.60 | **78.4** |
+| Beads v1 | 50.00 | 8.10 | 13.50 | 3.91 | **75.5** |
 
 *Quality now includes -10 integration penalty for non-self-contained tests (×15% = -1.5 points)*
 
@@ -150,21 +154,31 @@ Total: 86.0  [was 56.5, +29.5 improvement]
 
 **Key Achievement:** First and only attempt to implement testcontainers for self-contained integration tests.
 
+### 5th Place: Gastown (85.4)
+```
+Compliance: 12/12 (100%) × 50 = 50.00
+Tests: min(100, 40×1.5)=60 × 30% = 18.00
+Quality: (100 - 0 - 0 - 10) × 15% = 13.50  [0pt fix, 0pt skip, 10pt integration]
+Efficiency: (100 - 23.05) × 5% = 3.85
+```
+
+**Key Achievement:** Fastest implementation (~18 min) with zero fix commits and 40 BDD tests passing on first run.
+
 ---
 
 ## Detailed Metrics Comparison
 
-| Metric | Beads v3 | Hive v1 | RuVector | Swarm v2 | Hive v2 | Beads v1 | Beads v2 | Swarm v1 |
-|--------|----------|---------|----------|----------|---------|----------|----------|----------|
-| **Pattern** | Beads | Hive | Hive+RuVector | Swarm | Hive | Beads | Beads | Swarm |
-| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 |
-| **Effective Tests** | 59 | 64 | 61 | 37 | 43 | 18 | 25 | 63 |
-| **Skip Ratio** | 20% | 0% | 0% | ~3% | 0% | 0% | 0% | 0% |
-| **Lines of Code** | 4,947 | 3,545 | 8,751 | 5,546 | 3,754 | 2,194 | 2,793 | 8,683 |
-| **Fix Commits** | 0 | 1 | 1 | 0 | 1 | 0 | 1 | 7 |
-| **Duration** | ~23m | ~41m | ~2h 18m | ~1h 54m | ~41m | ~11m | ~14m | ~1h 49m |
-| **Real Data** | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Open Issues** | 2 | 3 | 2 | 1 | **0** | 1 | **0** | **0** |
+| Metric | Beads v3 | Hive v1 | RuVector | Hive v2 | Gastown | Swarm v1 | Swarm v2 | Beads v2 | Beads v1 |
+|--------|----------|---------|----------|---------|---------|----------|----------|----------|----------|
+| **Pattern** | Beads | Hive | Hive+RuVector | Hive | Gastown | Swarm | Swarm | Beads | Beads |
+| **Spec Compliance** | 16/16 | 15/16 | 16/16 | 16/16 | 12/12 | 16/16 | 16/16 | 16/16 | 16/16 |
+| **Effective Tests** | 59 | 64 | 61 | 43 | 40 | 63 | 37 | 25 | 18 |
+| **Skip Ratio** | 20% | 0% | 0% | 0% | 0% | 0% | ~3% | 0% | 0% |
+| **Lines of Code** | 4,947 | 3,545 | 8,751 | 3,754 | 2,305 | 8,683 | 5,546 | 2,793 | 2,194 |
+| **Fix Commits** | 0 | 1 | 1 | 1 | 0 | 7 | 0 | 1 | 0 |
+| **Duration** | ~23m | ~41m | ~2h 18m | ~41m | ~18m | ~1h 49m | ~1h 54m | ~14m | ~11m |
+| **Real Data** | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| **Open Issues** | 2 | 3 | 2 | **0** | 1 | **0** | 1 | **0** | 1 |
 
 ---
 
@@ -172,10 +186,11 @@ Total: 86.0  [was 56.5, +29.5 improvement]
 
 | Pattern | Attempts | Avg Score | Best Rank | Avg Effective Tests | Notes |
 |---------|----------|-----------|-----------|---------------------|-------|
-| **Hive** | 2 | 87.6 | 2nd | 50 | Strong pattern (v1: 92.4, v2: 82.7) |
-| **Beads** | 3 | 80.1 | 1st | 32 | Most consistent pattern |
-| **RuVector** | 1 | 91.6 | 3rd | 61 | Innovative architecture |
-| **Swarm** | 2 | 83.2 | 5th | 50 | Both improved (v1: 83.5, v2: 82.8), v1 now has testcontainers |
+| **Hive** | 2 | 88.5 | 2nd | 54 | Strong pattern (v1: 90.9, v2: 86.0) |
+| **Beads** | 3 | 81.9 | 1st | 34 | Most consistent pattern |
+| **RuVector** | 1 | 90.1 | 3rd | 61 | Innovative architecture |
+| **Gastown** | 1 | 85.4 | 5th | 40 | Fastest implementation (~18 min), zero fix commits |
+| **Swarm** | 2 | 83.2 | 6th | 50 | Both improved (v1: 83.5, v2: 82.8), v1 now has testcontainers |
 
 ---
 
@@ -205,11 +220,12 @@ due to slightly lower compliance (15/16 vs 16/16).
 
 ### Pattern Insights
 
-- **Best pattern:** Hive (highest avg score: 87.6)
+- **Best pattern:** Hive (highest avg score: 88.5)
 - **Most efficient:** Beads v1 (lowest LOC: 2,194)
 - **Most tests:** Hive v1 (64 effective tests)
-- **Fastest:** Beads v1 (~11 min autonomous)
-- **Best improvement:** Hive v2 (+26.2 points after issue fixes)
+- **Fastest:** Gastown (~18 min autonomous) with Beads v1 (~11 min) close second
+- **Cleanest:** Gastown (0 fix commits, 40 tests pass first try)
+- **Best improvement:** Hive v2 (+29.5 points after issue fixes)
 
 ### Common Strengths (Top 3)
 - Full or near-full spec compliance
@@ -244,11 +260,12 @@ due to slightly lower compliance (15/16 vs 16/16).
 | 2025-12-14-python-claude-beads-2 | results/2025-12-14-python-claude-beads-2.md |
 | 2025-10-30-python-hive | results/2025-10-30-python-hive.md |
 | 2025-12-15-python-claude-ruvector | results/2025-12-15-python-claude-ruvector.md |
-| 2025-12-14-python-claude-beads | results/2025-12-14-python-claude-beads.md |
-| 2025-12-13-python-claude-swarm | results/2025-12-13-python-claude-swarm.md |
-| 2025-12-01-python-claude-beads | results/2025-12-01-python-claude-beads.md |
 | 2025-12-13-python-claude-hive | results/2025-12-13-python-claude-hive.md |
+| 2026-01-13-python-gastown | results/2026-01-13-python-gastown.md |
 | 2025-09-30-python-swarm | results/2025-09-30-python-swarm.md |
+| 2025-12-13-python-claude-swarm | results/2025-12-13-python-claude-swarm.md |
+| 2025-12-14-python-claude-beads | results/2025-12-14-python-claude-beads.md |
+| 2025-12-01-python-claude-beads | results/2025-12-01-python-claude-beads.md |
 
 ---
 
@@ -259,13 +276,14 @@ due to slightly lower compliance (15/16 vs 16/16).
 | 2025-12-14-python-claude-beads-2 | 2 | 0 | 2 | Test Quality |
 | 2025-10-30-python-hive | 3 | 0 | 3 | Missing, Compliance, Test Quality |
 | 2025-12-15-python-claude-ruvector | 2 | 1 | 3 | Test Quality (testcontainers), Bug (path) |
+| 2026-01-13-python-gastown | 1 | 0 | 1 | Test Quality (testcontainers) |
 | 2025-12-13-python-claude-swarm | 1 | 5 | 6 | Test Quality (testcontainers) |
 | **2025-12-13-python-claude-hive** | **0** | **7** | 7 | ~~All Fixed~~ ✓ |
 | 2025-12-01-python-claude-beads | 1 | 7 | 8 | Test Quality (in-memory mock) |
 | **2025-12-14-python-claude-beads** | **0** | **4** | 4 | ~~All Fixed~~ ✓ |
 | **2025-09-30-python-swarm** | **0** | **7** | 7 | ~~All Fixed~~ ✓ |
 
-**Total Open Issues:** 9
+**Total Open Issues:** 10
 
 ### Issue Distribution by Type
 
@@ -278,4 +296,4 @@ due to slightly lower compliance (15/16 vs 16/16).
 
 ---
 
-Generated by compare-attempts SOP on 2025-01-04 (v3 - Effective Tests with Skip Penalty)
+Generated by compare-attempts SOP on 2026-01-13 (v4 - Effective Tests with Skip Penalty + Integration Test Quality)
